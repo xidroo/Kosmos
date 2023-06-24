@@ -18,8 +18,9 @@ class Rakieta:
     wysokosc = grafika.get_height()
     kat = 0
     czas = 0
+    moc = 100
 
-    def __init__(self,x,y,dx,dy,kat,rodzajMisji):
+    def __init__(self,x,y,dx,dy,kat,moc,rodzajMisji):
             self.x = x
             self.y = y
             self.dx = dx
@@ -30,6 +31,8 @@ class Rakieta:
             self.odpornosc = 0
             self.czas = pygame.time.get_ticks()
             self.jest = True
+            self.moc = moc
+
 
     def render(self, window, rodzajMisji):
         if self.kat != 0:

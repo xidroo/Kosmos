@@ -88,7 +88,7 @@ class Misja:
         babowce = min(1+TRUDNOSC,self.poziom)
         kargo = min(1+TRUDNOSC,self.poziom)
         krazownik = min(1+TRUDNOSC,self.poziom-3)
-        pancerniki = min(1+TRUDNOSC,self.poziom-4)
+        pancerniki = min(0+TRUDNOSC,self.poziom-4)
         if self.rodzaj == 4:
             self.przeciwnicy.append(EnemyPrzewodnik())
         if self.rodzaj == 1:  # babowiecd

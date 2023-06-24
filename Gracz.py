@@ -54,8 +54,10 @@ class Gracz:
     zbadalOslone = True
     procki = 0
     mocLaseru = 10
+    mocRakiet = 100
     wirus = 0
     kat = 0
+    glowica = 0
 
 
     #statystyki
@@ -74,7 +76,7 @@ class Gracz:
     __cecha = 0
 
 
-    def __init__(self,numer,rodzajMisji, TRUDNOSC,hp = None, maxHP = None,maxZlomu = None,zasiegMagnezu = None,rakietyMax = None, szybkoscTakiet = None, maxTemperatura = None, iloscLaserow = None, kosztNaprawy = None, cenaZlomu = None,mocLaseru = None, czasOdnawianiaOslony = None, kasa = None,procki = None, liczbaWykonanychMisji =None,strzalyAll = None,trafioneAll = None,kasaAll = None, prockiAll = None,wirus =None):
+    def __init__(self,numer,rodzajMisji, TRUDNOSC,hp = None, maxHP = None,maxZlomu = None,zasiegMagnezu = None,rakietyMax = None, szybkoscTakiet = None, maxTemperatura = None, iloscLaserow = None, kosztNaprawy = None, cenaZlomu = None,mocLaseru = None, czasOdnawianiaOslony = None, kasa = None,procki = None, liczbaWykonanychMisji =None,strzalyAll = None,trafioneAll = None,kasaAll = None, prockiAll = None,wirus =None,mocRakiety = None,glowica = None):
         if numer == 1:
             if rodzajMisji in [1,2]:
                 self.x = SZEROKOSC//2
@@ -191,6 +193,16 @@ class Gracz:
                 self.prockiAll = 0
             else:
                 self.prockiAll = prockiAll
+
+            if mocRakiety == None:
+                self.mocRakiet = 100
+            else:
+                self.mocRakiet = mocRakiety
+
+            if glowica == None:
+                self.glowica = 0
+            else:
+                self.glowica = glowica
 
             self.strzalyMisja = 0
             self.trafioneMisja = 0
@@ -401,9 +413,9 @@ class Gracz:
                 self.rakietaD.play()
                 self.aktualneRakiety -= 1
                 if rodzajMisji in [1, 2]:
-                    RAKIETY.append(Rakieta(self.x+self.szerokosc//2-8,self.y,0,-self.szybkoscRakiet,0,rodzajMisji))
+                    RAKIETY.append(Rakieta(self.x+self.szerokosc//2-8,self.y,0,-self.szybkoscRakiet,0,self.mocRakiet,rodzajMisji))
                 if rodzajMisji in [3, 4]:
-                    RAKIETY.append(Rakieta(self.x+self.szerokosc-5,self.y+self.wysokosc//2-8,self.szybkoscRakiet,0,-90,rodzajMisji))
+                    RAKIETY.append(Rakieta(self.x+self.szerokosc-5,self.y+self.wysokosc//2-8,self.szybkoscRakiet,0,-90,self.mocRakiet,rodzajMisji))
 
         self.render(window,rodzajMisji,myszPozycja)
 

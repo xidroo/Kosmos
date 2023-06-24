@@ -139,11 +139,11 @@ class EnemyPancernik:
             self.stop = False
             self.rakietaD.play()
             if rodzajMisji in [1, 2]:
-                RAKIETY_ENEMY.append(Rakieta(self.x+self.szerokosc//2,self.y+self.wysokosc//2-20,0,3,180,rodzajMisji))
-                RAKIETY_ENEMY.append(Rakieta(self.x+self.szerokosc//2,self.y+self.wysokosc//2+30,0,3,180,rodzajMisji))
+                RAKIETY_ENEMY.append(Rakieta(self.x+self.szerokosc//2,self.y+self.wysokosc//2-20,0,3,180,100,rodzajMisji))
+                RAKIETY_ENEMY.append(Rakieta(self.x+self.szerokosc//2,self.y+self.wysokosc//2+30,0,3,180,100,rodzajMisji))
             if rodzajMisji in [3, 4]:
-                RAKIETY_ENEMY.append(Rakieta(self.x , self.y + self.wysokosc // 2 , -3, 0, 90, rodzajMisji))
-                RAKIETY_ENEMY.append(Rakieta(self.x + 50, self.y + self.wysokosc // 2 , -3, 0, 90, rodzajMisji))
+                RAKIETY_ENEMY.append(Rakieta(self.x , self.y + self.wysokosc // 2 , -3, 0, 90,100, rodzajMisji))
+                RAKIETY_ENEMY.append(Rakieta(self.x + 50, self.y + self.wysokosc // 2 , -3, 0, 90,100, rodzajMisji))
 
         if rodzajMisji in [1, 2]:
             if self.x+self.szerokosc > SZEROKOSC - 10 or self.x < 10:

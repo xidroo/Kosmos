@@ -52,26 +52,35 @@ grafikaEnemyPrzewodnik.set_colorkey('white')
 grafikaEnemyWieza.set_colorkey('white')
 grafikaEnemyBeczka.set_colorkey('white')
 grafikaEnemyPancernik.set_colorkey('white')
-komunikatSave = "Podaj imię: "
+
 name = ""
 db = sqlite3.connect("baza.db")
 cursor = db.cursor()
-cursor.execute("CREATE TABLE IF NOT EXISTS gracze(id integer PRIMARY KEY AUTOINCREMENT, name text,aktualneHP integer, maxHP integer, maxZlomu integer, zasiegMagnezu integer, rakietyMax integer,szybkoscRakiet integer,maxTemperatura integer,iloscLaserow integer,kosztNaprawy integer,cenaZlomu integer,mocLaseru integer,czasOdnawianiaOslony integer,kasa integer,procki integer,liczbaWykonanychMisji integer,trudnosc integer,strzalyAll integer,trafioneAll integer,kasaAll integer,prockiAll integer,wirus integer )")
-cursor.execute("CREATE TABLE IF NOT EXISTS technologie(gracz text,t0 integer,t1 integer,t2 integer,t3 integer,t4 integer,t5 integer,t6 integer,t7 integer,t8 integer,t9 integer,t10 integer,t11 integer,t12 integer)")
-cursor.execute("CREATE TABLE IF NOT EXISTS zniszczone(gracz text,w0 integer,w1 integer,w2 integer,w3 integer,w4 integer,w5 integer,w6 integer,w7 integer,w8 integer,w9 integer,w10 integer,w11 integer,w12 integer,w13 integer,w14 integer,w15 integer,w16 integer,w17 integer,w18 integer,w19 integer)")
+cursor.execute("CREATE TABLE IF NOT EXISTS gracze(id integer PRIMARY KEY AUTOINCREMENT, name text,aktualneHP integer, maxHP integer, maxZlomu integer, zasiegMagnezu integer, rakietyMax integer,szybkoscRakiet integer,maxTemperatura integer,iloscLaserow integer,kosztNaprawy integer,cenaZlomu integer,mocLaseru integer,czasOdnawianiaOslony integer,kasa integer,procki integer,liczbaWykonanychMisji integer,trudnosc integer,strzalyAll integer,trafioneAll integer,kasaAll integer,prockiAll integer,wirus integer,mocRakiet integer,glowica integer )")
+cursor.execute("CREATE TABLE IF NOT EXISTS technologie(id integer PRIMARY KEY AUTOINCREMENT,gracz text,t0 integer,t1 integer,t2 integer,t3 integer,t4 integer,t5 integer,t6 integer,t7 integer,t8 integer,t9 integer,t10 integer,t11 integer,t12 integer,t13 integer,t14 integer)")
+cursor.execute("CREATE TABLE IF NOT EXISTS zniszczone(id integer PRIMARY KEY AUTOINCREMENT,gracz text,w0 integer,w1 integer,w2 integer,w3 integer,w4 integer,w5 integer,w6 integer,w7 integer,w8 integer,w9 integer,w10 integer,w11 integer,w12 integer,w13 integer,w14 integer,w15 integer,w16 integer,w17 integer,w18 integer,w19 integer)")
+cursor.execute("SELECT COUNT(*) FROM gracze")
+iloscZapisow = cursor.fetchone()[0]
+if iloscZapisow == 0:
+    for i in range(5):
+        cursor.execute("INSERT INTO gracze VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",["WOLNE",200,200,15,200,5,3,100,1,3,10,10,10,5000,3,0,1,0,0,0,0,0,100,0])
+        cursor.execute("INSERT INTO technologie VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ["WOLNE",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+        cursor.execute("INSERT INTO zniszczone VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ["WOLNE",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+
 zapisy = []
 iloscZapisow = 0
 buttonsZapisy = []
 buttonsUsunZapisy = []
 def przygotujPrzyciskiOdczyt():
     global iloscZapisow, zapisy, buttonsZapisy, buttonsUsunZapisy
+    cursor.execute("SELECT COUNT(*) FROM gracze WHERE name NOT LIKE ?",["WOLNE"])
+    iloscZapisow = cursor.fetchone()[0]
     buttonsZapisy.clear()
     buttonsUsunZapisy.clear()
-    cursor.execute("SELECT COUNT(*) FROM gracze")
-    iloscZapisow = cursor.fetchone()[0]
     if iloscZapisow > 0:
-        cursor.execute("SELECT name,liczbaWykonanychMisji,TRUDNOSC FROM gracze")
+        cursor.execute("SELECT name,liczbaWykonanychMisji,TRUDNOSC FROM gracze WHERE name NOT LIKE ?",["WOLNE"])
         zapisy = cursor.fetchall()
+        print(zapisy)
         for zapis in zapisy:
             text = "Gracz: " + zapis[0] + "   Wykonane misje: " + str(zapis[1]) + "   Poziom: "
             if zapis[2] == 1:
@@ -121,9 +130,9 @@ def losujNoweMisje(wykonaneMisje):
 
 def wyswietlStatystykeZniszczonych(listaZniszczonych = []):
     rozmiar = len(listaZniszczonych)
-    x = 370
+    x = 400
     y = 100
-    x1 = 670
+    x1 = 690
     y1 = 100
     for i in range(1,rozmiar):
         if listaZniszczonych[i] != 0:
@@ -239,6 +248,7 @@ czas_gry = pygame.time.get_ticks()
 # 8 - ULEPSZENIA
 # 9 - ZAPISZ GRĘ
 # 10 - WCZYTAJ GRĘ
+# 11 - NOWA GRA
 MUZA = False
 KONIEC_MISJI = False
 czasKoniec = pygame.time.get_ticks()
@@ -249,9 +259,10 @@ czasAnimacji = pygame.time.get_ticks()
 odliczanie = 3
 nagrodaZaMisje = 0
 misjaWykonana = False
-iloscTechnologii = 13
+iloscTechnologii = 15
 TECHY = []
 TECHY_WSZYSTKIE = []
+GRA_ZAPISANA =False
 
 
 
@@ -301,13 +312,15 @@ buttonKup22 = Button('lightslateblue', 'cadetblue1', 'black', 'Kup',13,3)
 buttonKup32 = Button('lightslateblue', 'cadetblue1', 'black', 'Kup',13,3)
 buttonTECH_P = Button('lightslateblue', 'cadetblue1', 'black', '>',15,15)
 buttonTECH_L = Button('lightslateblue', 'cadetblue1', 'black', '<',15,15)
-buttonKONIEC = Button('lightslateblue', 'cadetblue1', 'black', 'KONIEC',10,3)
+buttonKONIEC = Button('lightslateblue', 'cadetblue1', 'black', 'KONIEC',70)
 buttonTRUDNOSC = Button('lightslateblue', 'cadetblue1', 'black', 'Ustaw poziom TRUDNOŚCI',10)
 buttonZAPISZ = Button('lightslateblue', 'cadetblue1', 'black', 'Zapisz stan gry',10)
-buttonWCZYTAJ = Button('lightslateblue', 'cadetblue1', 'black', 'Wczytaj stan gry',10)
-buttonNADPISZ = Button('lightslateblue', 'cadetblue1', 'black', 'NADPISZ stan gry',10)
+buttonKONTYNUUJ = Button('lightslateblue', 'cadetblue1', 'black', 'WCZYTAJ GRĘ',50)
+buttonNOWA_GRA = Button('lightslateblue', 'cadetblue1', 'black', 'NOWA GRA',60)
+
 buttonINNE = Button('lightslateblue', 'cadetblue1', 'black', 'Podaj inne imię',10)
 buttonMENU = Button('lightslateblue', 'cadetblue1', 'black', 'Wróć do MENU gry',10)
+buttonROZPOCZNIJ = Button('lightslateblue', 'cadetblue1', 'black', 'ROZPOCZNIJ GRĘ !',50,20)
 fontOdliczanie = pygame.font.SysFont('perpetuatitlingpogrubiony', 450)
 fontNazwyFaz = pygame.font.SysFont('comicsansms', 50)
 font40 = pygame.font.SysFont('comicsansms', 80)
@@ -316,17 +329,34 @@ fontMniejsza = pygame.font.SysFont('comicsansms', 15)
 wybranoMisje = False
 numerWybranejMisji = 0
 
+def trudnoscNAstring(TRUDNOSC):
+    if TRUDNOSC == 1:
+        return "normalna"
+    if TRUDNOSC == 2:
+        return "trudna"
+    if TRUDNOSC == 3:
+        return "hardcore"
+
+def takiProfilJuzIstnieje(name):
+    cursor.execute("SELECT name FROM gracze")
+    names = []
+    for n in cursor:
+        names.append(n[0])
+    return name in names
+
+
 
 
 GRACZ = 0
 ENEMY = []
+AKTUALNY_ID_PROFILU = 0
 
 muzyka1.set_volume(0.2)
 muzyka2.set_volume(0.2)
 MUZYKA = muzyka1
 
 run = True
-
+podawanieName = False
 czasRespienia = 0
 
 while run:
@@ -344,7 +374,7 @@ while run:
     for zdarzenie in pygame.event.get():
         if zdarzenie.type == pygame.QUIT:
             run = False
-        if komunikatSave == "Podaj imię: " and FAZA == 9:
+        if podawanieName and FAZA == 11 and len(name) < 9:
             if zdarzenie.type == pygame.KEYDOWN and zdarzenie.key == pygame.K_a:name+="A"
             elif zdarzenie.type == pygame.KEYDOWN and zdarzenie.key == pygame.K_b:name+="B"
             elif zdarzenie.type == pygame.KEYDOWN and zdarzenie.key == pygame.K_c:name+="C"
@@ -371,7 +401,7 @@ while run:
             elif zdarzenie.type == pygame.KEYDOWN and zdarzenie.key == pygame.K_SPACE:name+=" "
             elif zdarzenie.type == pygame.KEYDOWN and zdarzenie.key == pygame.K_x:name+="X"
             elif zdarzenie.type == pygame.KEYDOWN and zdarzenie.key == pygame.K_v:name+="V"
-            elif zdarzenie.type == pygame.KEYDOWN and zdarzenie.key == pygame.K_BACKSPACE:
+        if len(name) > 0 and podawanieName and FAZA == 11 and zdarzenie.type == pygame.KEYDOWN and zdarzenie.key == pygame.K_BACKSPACE:
                 kopiaName = ""
                 for i in range(len(name)-1):
                     kopiaName += name[i]
@@ -382,78 +412,101 @@ while run:
     if FAZA == 0:
         okno.blit(grafikaScreen,(350,5))
         okno.blit(font40.render("HORDOWIE ATAKUJĄ!!! ", True, BIALY), (20, 100))
-        buttonKONIEC.render(okno, 690, 580, 280, 50)
-        buttonTRUDNOSC.render(okno, 30, 560, 280, 50)
-        buttonBaza.render(okno, 30, 500, 280, 50)
-        if iloscZapisow > 0:
-            buttonWCZYTAJ.render(okno, 330, 560, 280, 50)
 
-        buttonBaza.updateText("ROZPOCZNIJ NOWĄ GRĘ")
+        buttonNOWA_GRA.render(okno, 30, 580, 280, 50)
+        if iloscZapisow > 0:
+            buttonKONTYNUUJ.render(okno, 360, 580, 280, 50)
+        buttonKONIEC.render(okno, 690, 580, 280, 50)
+
         if buttonKONIEC.clik():
             run = False
-        if buttonTRUDNOSC.clik():
-            TRUDNOSC += 1
-            if TRUDNOSC > 3:
-                TRUDNOSC = 1
-        if buttonWCZYTAJ.clik():
-
+        if buttonNOWA_GRA.clik():
+            FAZA = 11
+            podawanieName = True
+        if buttonKONTYNUUJ.clik():
             FAZA = 10
-        if buttonBaza.clik():
-            FAZA = 5
-            buttonKONIEC.time = pygame.time.get_ticks()
-            katGracza = 0
-            buttonBaza.updateText("Powrót do bazy")
-            GRACZ = Gracz(1, 1, TRUDNOSC)
+            buttonMENU.time = pygame.time.get_ticks()
 
-            for i in range(iloscTechnologii):
-                TECHY_WSZYSTKIE.append(Technologia(i))
-                TECHY_WSZYSTKIE[i].odswiezObraz(GRACZ)
-                TECHY.append(TECHY_WSZYSTKIE[i])
+        #nowa gra
+    if FAZA == 11:
 
-            iloscTechnologii = len(TECHY)
-
-            numerTechu = 0
-            DOSTEPNE_MISJE = losujNoweMisje(GRACZ.wykonaneMisje)
-            ENEMY = DOSTEPNE_MISJE[0].inicjujWrogow(TRUDNOSC)
-            katGracza = 0
-
-        okno.blit(fontMala.render("POZIOM: ", True, BIALY), (50, 615))
-        if TRUDNOSC == 1:
-            okno.blit(fontMala.render(" NORMALNY", True, BIALY), (140, 615))
-        if TRUDNOSC == 2:
-            okno.blit(fontMala.render(" TRUDNY", True, BIALY), (140, 615))
-        if TRUDNOSC == 3:
-            okno.blit(fontMala.render(" HARDCORE", True, BIALY), (140, 615))
+        cursor.execute("SELECT COUNT(*) FROM gracze WHERE name = ?", ["WOLNE"])
+        liczbaWolnychProfili = cursor.fetchone()[0]
+        if liczbaWolnychProfili > 0:
+            okno.blit(fontNazwyFaz.render("ZAKŁADANIE NOWEGO PROFILU", True, BIALY), (90, 10))
+            okno.blit(fontNazwyFaz.render("Podaj nazwę profilu: " + name, True, BIALY), (50, 100))
+            if takiProfilJuzIstnieje(name) and len(name) > 0:
+                okno.blit(fontNazwyFaz.render("Taki profil już istnieje", True, BIALY), (50, 200))
+            else:
+                if len(name) > 0:
+                    okno.blit(fontNazwyFaz.render("Ustaw trudność: " + trudnoscNAstring(TRUDNOSC), True, BIALY), (50, 200))
+                    buttonTRUDNOSC.render(okno, 680, 215, 280, 50)
+                    if buttonTRUDNOSC.clik():
+                        TRUDNOSC += 1
+                        if TRUDNOSC > 3:
+                            TRUDNOSC = 1
+                    buttonROZPOCZNIJ.render(okno, 350, 300, 300, 80)
+                    if buttonROZPOCZNIJ.clik():
+                        cursor.execute("SELECT MIN(id) FROM gracze WHERE name = ?",["WOLNE"])
+                        id = cursor.fetchone()[0]
+                        AKTUALNY_ID_PROFILU = id
+                        cursor.execute("UPDATE gracze SET name = ? WHERE id = ?",[name,id])
+                        cursor.execute("UPDATE technologie SET gracz = ? WHERE id = ?",[name,id])
+                        cursor.execute("UPDATE zniszczone SET gracz = ? WHERE id = ?",[name,id])
+                        db.commit()
+                        GRACZ = Gracz(1, 1, TRUDNOSC)
+                        for i in range(iloscTechnologii):
+                            TECHY_WSZYSTKIE.append(Technologia(i))
+                            TECHY_WSZYSTKIE[i].odswiezObraz(GRACZ)
+                            TECHY.append(TECHY_WSZYSTKIE[i])
+                        iloscTechnologii = len(TECHY)
+                        numerTechu = 0
+                        DOSTEPNE_MISJE = losujNoweMisje(GRACZ.wykonaneMisje)
+                        ENEMY = DOSTEPNE_MISJE[0].inicjujWrogow(TRUDNOSC)
+                        katGracza = 0
+                        FAZA = 5
+                        podawanieName = False
+        else:
+            okno.blit(fontNazwyFaz.render("Brak wolnych profili :(", True, BIALY), (50, 200))
+        buttonMENU.render(okno, 400, 580, 250, 50)
+        if buttonMENU.clik():
+            FAZA = 0
+            buttonKONTYNUUJ.time = pygame.time.get_ticks()
         # Odczyt
     if FAZA == 10:
-        okno.blit(fontNazwyFaz.render("WYBIERZ I WCZYTAJ ZAPIS GRY", True, BIALY), (90, 10))
+        okno.blit(fontNazwyFaz.render("WYBIERZ I WCZYTAJ PROFIL ", True, BIALY), (90, 10))
         buttonKONIEC.render(okno, 700, 580, 250, 50)
-        buttonMENU.render(okno, 50, 580, 250, 50)
+        buttonMENU.render(okno, 400, 580, 250, 50)
         y = 100
         for i in range(len(zapisy)):
-            buttonsZapisy[i].render(okno,30,y,600,50)
-            buttonsUsunZapisy[i].render(okno,650,y,120,50)
+            buttonsZapisy[i].render(okno,50,y,600,50)
+            buttonsUsunZapisy[i].render(okno,750,y,150,50)
+
             y+=60
             if buttonsZapisy[i].clik():
                 imie = zapisy[i][0]
+
                 cursor.execute("SELECT * FROM gracze WHERE name = ?",[imie])
                 d = cursor.fetchone()
-                GRACZ = Gracz(1,1,d[17],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15],d[16],d[18],d[19],d[20],d[21],d[22])
+                GRACZ = Gracz(1,1,d[17],d[2],d[3],d[4],d[5],d[6],d[7],d[8],d[9],d[10],d[11],d[12],d[13],d[14],d[15],d[16],d[18],d[19],d[20],d[21],d[22],d[23],d[24])
                 DOSTEPNE_MISJE = losujNoweMisje(GRACZ.wykonaneMisje)
                 FAZA = 5
-                cursor.execute("SELECT * FROM zniszczone WHERE gracz = ?",[imie])
+                cursor.execute("SELECT id FROM gracze WHERE name = ?", [imie])
+                id = cursor.fetchone()[0]
+                AKTUALNY_ID_PROFILU = id
+                cursor.execute("SELECT * FROM zniszczone WHERE id = ?",[id])
                 z = cursor.fetchone()
                 Z = []
-                for i in range(1,len(z)):
+                for i in range(2,len(z)):
                     Z.append(z[i])
                 GRACZ.zniszczone.clear()
                 for zn in Z:
                     GRACZ.zniszczone.append(zn)
                 print(GRACZ.zniszczone)
-                cursor.execute("SELECT * FROM technologie WHERE gracz = ?",[imie])
+                cursor.execute("SELECT * FROM technologie WHERE id = ?",[id])
                 t = cursor.fetchone()
                 T = []
-                for i in range(1,len(t)):
+                for i in range(2,len(t)):
                     T.append(t[i])
                 TECHY.clear()
                 for i in range(iloscTechnologii):
@@ -463,11 +516,18 @@ while run:
                 katGracza = 0
                 buttonBaza.updateText("Powrót do bazy")
                 break
+
             if buttonsUsunZapisy[i].clik():
                 imie = zapisy[i][0]
-                cursor.execute("DELETE FROM gracze WHERE name = ?", [imie])
-                cursor.execute("DELETE FROM technologie WHERE gracz = ?",[imie])
-                cursor.execute("DELETE FROM zniszczone WHERE gracz = ?",[imie])
+                cursor.execute("DELETE FROM gracze WHERE id = ?", [AKTUALNY_ID_PROFILU])
+                cursor.execute("DELETE FROM technologie WHERE id = ?", [AKTUALNY_ID_PROFILU])
+                cursor.execute("DELETE FROM zniszczone WHERE id = ?", [AKTUALNY_ID_PROFILU])
+                cursor.execute("INSERT INTO gracze VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                               ["WOLNE", 200, 200, 15, 200, 5, 3, 100, 1, 3, 10, 10, 10, 5000, 3, 0, 1, 0, 0, 0, 0, 0,100,0])
+                cursor.execute("INSERT INTO technologie VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                               ["WOLNE", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+                cursor.execute("INSERT INTO zniszczone VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                               ["WOLNE", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
                 db.commit()
                 zapisy.pop(i)
                 buttonsUsunZapisy.pop(i)
@@ -475,84 +535,36 @@ while run:
                 for przyciski in buttonsUsunZapisy:
                     przyciski.time = pygame.time.get_ticks()
                 przygotujPrzyciskiOdczyt()
+
                 break
 
         if buttonMENU.clik():
             FAZA = 0
+            buttonKONTYNUUJ.time = pygame.time.get_ticks()
         if buttonKONIEC.clik():
             run = False
     # Zapisz
     if FAZA == 9:
-        okno.blit(fontNazwyFaz.render("ZAPISZ STAN GRY", True, BIALY), (90, 10))
-        if komunikatSave == "Taki zapis już istnieje!":
-            okno.blit(fontNazwyFaz.render(komunikatSave, True, BIALY), (50, 100))
-        else:
-            okno.blit(fontNazwyFaz.render(komunikatSave + name, True, BIALY), (50, 100))
+        cursor.execute("SELECT name FROM gracze WHERE id = ?", [AKTUALNY_ID_PROFILU])
+        aktualneName = cursor.fetchone()[0]
+        cursor.execute("DELETE FROM gracze WHERE id = ?", [AKTUALNY_ID_PROFILU])
+        cursor.execute("DELETE FROM technologie WHERE id = ?", [AKTUALNY_ID_PROFILU])
+        cursor.execute("DELETE FROM zniszczone WHERE id = ?", [AKTUALNY_ID_PROFILU])
+        cursor.execute("INSERT INTO gracze VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[AKTUALNY_ID_PROFILU,aktualneName,GRACZ.hp,GRACZ.maxHP,GRACZ.maxZlom,GRACZ.zasiegMagnesu,GRACZ.maxRakiety,GRACZ.szybkoscRakiet,GRACZ.maxTemperatura,GRACZ.iloscLaserow,GRACZ.kosztNaprawy, GRACZ.cenaZlomu,GRACZ.mocLaseru,GRACZ.czasOdnawianiaOslony,GRACZ.kasa,GRACZ.procki,GRACZ.wykonaneMisje, TRUDNOSC, GRACZ.strzalyAll,GRACZ.trafioneAll,GRACZ.kasaAll,GRACZ.prockiAll,GRACZ.wirus,GRACZ.mocRakiet,GRACZ.glowica])
+        lista = [AKTUALNY_ID_PROFILU,name]
+        for tech in TECHY:
+            lista.append(tech.stopien)
+        cursor.execute("INSERT INTO technologie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",lista)
+        lista.clear()
+        lista = [AKTUALNY_ID_PROFILU,name]
+        for zn in GRACZ.zniszczone:
+                lista.append(zn)
+        cursor.execute("INSERT INTO zniszczone VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",lista)
+        db.commit()
+        GRA_ZAPISANA = True
+        FAZA = 5
 
-        buttonKONIEC.render(okno, 700, 470, 250, 50)
-        buttonBaza.render(okno, 700, 400, 250, 50)
-        if len(name) > 0 and komunikatSave != "Taki zapis już istnieje!":
-            buttonZAPISZ.render(okno, 700, 120, 250, 50)
-        if buttonZAPISZ.clik():
-            cursor.execute("SELECT COUNT(*) FROM gracze WHERE name = ?",[name])
-            liczba = cursor.fetchone()[0]
-            if liczba == 1:
-                komunikatSave = "Taki zapis już istnieje!"
-            else:
-                cursor.execute("INSERT INTO gracze VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[name,GRACZ.hp,GRACZ.maxHP,GRACZ.maxZlom,GRACZ.zasiegMagnesu,GRACZ.maxRakiety,GRACZ.szybkoscRakiet,GRACZ.maxTemperatura,GRACZ.iloscLaserow,GRACZ.kosztNaprawy, GRACZ.cenaZlomu,GRACZ.mocLaseru,GRACZ.czasOdnawianiaOslony,GRACZ.kasa,GRACZ.procki,GRACZ.wykonaneMisje, TRUDNOSC, GRACZ.strzalyAll,GRACZ.trafioneAll,GRACZ.kasaAll,GRACZ.prockiAll,GRACZ.wirus])
-                lista = [name]
-                for tech in TECHY:
-                    lista.append(tech.stopien)
-                cursor.execute("INSERT INTO technologie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",lista)
-                lista.clear()
-                lista = [name]
-                for zn in GRACZ.zniszczone:
-                    lista.append(zn)
-                cursor.execute("INSERT INTO zniszczone VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",lista)
 
-                db.commit()
-                komunikatSave = "Gra została zapisana"
-                name = ""
-                przygotujPrzyciskiOdczyt()
-        if komunikatSave == "Taki zapis już istnieje!":
-            buttonNADPISZ.render(okno, 100, 200, 250, 50)
-            buttonINNE.render(okno, 400, 200, 250, 50)
-            if buttonINNE.clik():
-                komunikatSave = "Podaj imię: "
-                name = ""
-            if buttonNADPISZ.clik():
-                cursor.execute("DELETE FROM gracze WHERE name = ?",[name])
-                cursor.execute("DELETE FROM technologie WHERE gracz = ?",[name])
-                cursor.execute("INSERT INTO gracze VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                               [name, GRACZ.hp, GRACZ.maxHP, GRACZ.maxZlom, GRACZ.zasiegMagnesu, GRACZ.maxRakiety,
-                                GRACZ.szybkoscRakiet, GRACZ.maxTemperatura, GRACZ.iloscLaserow, GRACZ.kosztNaprawy,
-                                GRACZ.cenaZlomu, GRACZ.mocLaseru, GRACZ.czasOdnawianiaOslony, GRACZ.kasa, GRACZ.procki,
-                                GRACZ.wykonaneMisje, TRUDNOSC, GRACZ.strzalyAll, GRACZ.trafioneAll, GRACZ.kasaAll,
-                                GRACZ.prockiAll, GRACZ.wirus])
-
-                lista = [name]
-                for tech in TECHY:
-                    lista.append(tech.stopien)
-                cursor.execute("INSERT INTO technologie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", lista)
-                cursor.execute("DELETE FROM zniszczone WHERE gracz = ?",[name])
-
-                lista.clear()
-                lista = [name]
-                for zn in GRACZ.zniszczone:
-                    lista.append(zn)
-                cursor.execute("INSERT INTO zniszczone VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", lista)
-
-                db.commit()
-                komunikatSave = "Gra została zapisana"
-                name = ""
-                przygotujPrzyciskiOdczyt()
-        if buttonBaza.clik():
-            FAZA = 5
-            buttonWCZYTAJ.time = pygame.time.get_ticks()
-            name = ""
-            komunikatSave = "Podaj imię: "
-        if buttonKONIEC.clik():
-            run = False
     # Baza
     if FAZA == 5:
         okno.blit(fontNazwyFaz.render("BAZA", True, BIALY), (90, 10))
@@ -566,11 +578,15 @@ while run:
         buttonStstystyki.render(okno,x,y+120,250,50)
         buttonUlepszenia.render(okno,x,y+60,250,50)
         buttonMisja.render(okno,x,y+180,250,75)
-        buttonZAPISZ.render(okno,x,y+300,250,50)
-        if iloscZapisow > 0:
-            buttonWCZYTAJ.render(okno,x,y+360,250,50)
-        buttonKONIEC.render(okno,700,y+420,250,50)
+        if not GRA_ZAPISANA:
+            buttonZAPISZ.render(okno,x,y+300,250,50)
 
+        buttonMENU.render(okno, x, y+440, 250, 50)
+        if buttonMENU.clik():
+            FAZA = 0
+            buttonKONTYNUUJ.time = pygame.time.get_ticks()
+
+        buttonKONIEC.render(okno,700,y+500,250,50)
         okno.blit(fontMala.render("T W Ó J   D R O N", True, BIALY), (50, 80))
         okno.blit(fontMala.render("HP:                                "+ str(GRACZ.maxHP)+"/",True, BIALY), (20, 115))
         if GRACZ.maxHP == GRACZ.hp:
@@ -586,9 +602,10 @@ while run:
         okno.blit(fontMala.render("ZASIĘG MAGNESU:    " + str(GRACZ.zasiegMagnesu), True, BIALY), (20, 265))
         okno.blit(fontMala.render("ILOŚĆ RAKIET:            " + str(GRACZ.maxRakiety), True, BIALY), (20, 290))
         okno.blit(fontMala.render("SZYBKOŚĆ RAKIET:     " + str(GRACZ.szybkoscRakiet), True, BIALY), (20, 315))
-        okno.blit(fontMala.render("KOSZT NAPRAWY:      " + str(GRACZ.kosztNaprawy) + "$ / 1 HP", True, BIALY), (20, 340))
-        okno.blit(fontMala.render("CENA ZŁOMU:             " + str(GRACZ.cenaZlomu) + "$ / 1 złom", True, BIALY), (20, 365))
-        okno.blit(fontMala.render("CZAS OSŁONY:           " + str(GRACZ.czasOdnawianiaOslony/1000) + " s", True, BIALY), (20, 390))
+        okno.blit(fontMala.render("MOC RAKIET:          " + str(GRACZ.mocRakiet), True, BIALY), (20, 340))
+        okno.blit(fontMala.render("KOSZT NAPRAWY:      " + str(GRACZ.kosztNaprawy) + "$ / 1 HP", True, BIALY), (20, 365))
+        okno.blit(fontMala.render("CENA ZŁOMU:             " + str(GRACZ.cenaZlomu) + "$ / 1 złom", True, BIALY), (20, 390))
+        okno.blit(fontMala.render("CZAS OSŁONY:           " + str(GRACZ.czasOdnawianiaOslony/1000) + " s", True, BIALY), (20, 415))
         okno.blit(fontMala.render("PROCKI:         " + str(GRACZ.procki) , True, BIALY), (20, 480))
         okno.blit(fontMala.render("KASA:           " + str(GRACZ.kasa) + " $", True, BIALY), (20, 500))
         if TRUDNOSC == 1:
@@ -600,10 +617,7 @@ while run:
 
         if buttonKONIEC.clik():
             run = False
-        if buttonWCZYTAJ.clik():
-            FAZA = 10
-            DOSTEPNE_MISJE = losujNoweMisje(GRACZ.wykonaneMisje)
-            buttonMENU.time = pygame.time.get_ticks()
+
         if buttonUlepszenia.clik():
             FAZA = 8
             numerTechu = 0
@@ -632,11 +646,13 @@ while run:
             FAZA = 9
 
 
+
     # STATYSTYKI ALL
     if FAZA == 6:
         buttonBaza.render(okno, 50, WYSOKOSC - 100, 180, 50)
         if buttonBaza.clik():
             FAZA = 5
+
             buttonKONIEC.time = pygame.time.get_ticks()
         okno.blit(fontNazwyFaz.render("Twoje statystyki ", True, BIALY), (150, 2))
 
@@ -654,12 +670,13 @@ while run:
         okno.blit(fontMala.render("Wykonane misje: " + str(GRACZ.wykonaneMisje) , True, BIALY),(30, y+150))
         okno.blit(fontMala.render("Pokonanych przeciwników: " + str(sum(GRACZ.zniszczone)) , True, BIALY),(30, y+180))
         wyswietlStatystykeZniszczonych(GRACZ.zniszczone)
-
+#naprawa
     if FAZA == 7:
         okno.blit(fontNazwyFaz.render("Naprawa drona ", True, BIALY), (150, 2))
         buttonBaza.render(okno, 50, WYSOKOSC - 100, 180, 50)
         if buttonBaza.clik():
             FAZA = 5
+            GRA_ZAPISANA = False
             buttonKONIEC.time = pygame.time.get_ticks()
 
         pasek(okno, 20, 250, 50, 400, GRACZ.maxHP, GRACZ.hp, (255, 255, 255))
@@ -696,6 +713,7 @@ while run:
         buttonBaza.render(okno, 30,580, 180, 50)
         if buttonBaza.clik():
             FAZA = 5
+            GRA_ZAPISANA = False
             buttonKONIEC.time = pygame.time.get_ticks()
 
         buttonTECH_L.render(okno,30,200,50,50)
@@ -875,6 +893,7 @@ while run:
                 GRACZ.kasa += (AKTUALNA_MISJA.naroda + GRACZ.cenaZlomu * GRACZ.aktualnyZlom)
                 GRACZ.kasaAll += (AKTUALNA_MISJA.naroda + GRACZ.cenaZlomu * GRACZ.aktualnyZlom)
             FAZA = 5
+            GRA_ZAPISANA = False
             buttonKONIEC.time = pygame.time.get_ticks()
             DOSTEPNE_MISJE.clear()
             DOSTEPNE_MISJE = losujNoweMisje(GRACZ.wykonaneMisje)
@@ -907,17 +926,13 @@ while run:
         pygame.draw.line(okno,CZARNY,(0,550),(SZEROKOSC,550),4)
 
 
-        if RODZAJ_MISJI == 2 and CZAS_GRY % 7 == 0 and pygame.time.get_ticks() - czasRespienia > 1100:
+        if RODZAJ_MISJI == 2 and CZAS_GRY % 7 == 0 and pygame.time.get_ticks() - czasRespienia > 1100 and AKTUALNA_MISJA.iloscWiez > 0 :
             czasRespienia = pygame.time.get_ticks()
             produkcjaFabrykaD.play()
             if random.randint(1,100) < 50:
                 ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI))
             else:
                 ENEMY.append(Enemy(RODZAJ_MISJI))
-
-
-
-
             czasRespienia = pygame.time.get_ticks()
 
 
@@ -928,7 +943,43 @@ while run:
             rakieta.update(okno,RODZAJ_MISJI)
             if not rakieta.jest:
                 WYBUCHY.append(Wybuch(rakieta.getRect().topleft[0]-20,rakieta.getRect().topleft[1]-20,2))
+                if GRACZ.glowica > 0 and rakieta.x < SZEROKOSC and rakieta.y > 0:
+                    pygame.draw.circle(okno, CZERWONY, (rakieta.x, rakieta.y), GRACZ.glowica, 4)
+                    for enemy in ENEMY:
+                        odleglosc = obliczOdleglosc(rakieta.x, rakieta.y, enemy.getRect().centerx,enemy.getRect().centery)
+                        if odleglosc <= GRACZ.glowica:
+                            obrazenia = GRACZ.mocRakiet * 0.01 * ((odleglosc * 100) // GRACZ.glowica)
+                            if enemy.rodzaj in [6, 8, 10]:
+                                if enemy.oslona:
+                                    enemy.oslona = False
+                                    enemy.czasOslony = pygame.time.get_ticks()
+                            else:
+                                enemy.hit(int(obrazenia))
+                        if enemy.hp <= 0:
+                            if enemy.rodzaj in [9, 10, 13]:
+                                WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
+                            elif enemy.rodzaj == 12:
+                                WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
+                                WYBUCHY.append(Wybuch(enemy.x - 25, enemy.y + 50, 3))
+                                WYBUCHY.append(Wybuch(enemy.x, enemy.y + 75, 3))
+                            else:
+                                WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 1))
+                            wybuchD.play()
+                            generujZlom(enemy, ZLOMY, PROCKI)
+                            GRACZ.zniszczone[enemy.rodzaj] += 1
+                            GRACZ.zniszczoneMisja[enemy.rodzaj] += 1
+                        if not enemy.jest:
+                            if enemy.rodzaj == 11:
+                                AKTUALNA_MISJA.iloscWiez -= 1
+                            if enemy.rodzaj == 12 and enemy.x == 300:
+                                AKTUALNA_MISJA.beczki[0] = 0
+                            if enemy.rodzaj == 12 and enemy.x == 695:
+                                AKTUALNA_MISJA.beczki[1] = 0
+                            ENEMY.remove(enemy)
                 RAKIETY.remove(rakieta)
+
+
+
 
         for rakieta in RAKIETY:
             for enemy in ENEMY:
@@ -942,9 +993,13 @@ while run:
                             enemy.oslona = False
                             enemy.czasOslony = pygame.time.get_ticks()
                         else:
-                            enemy.hit(100)
+                            enemy.hit(rakieta.moc)
                     else:
-                        enemy.hit(100)
+                        enemy.hit(rakieta.moc)
+
+
+
+
                     rakieta.jest = False
                     wybuchRakietyD.play()
                     if enemy.hp <= 0:
@@ -993,7 +1048,7 @@ while run:
                     GRACZ.oslona = False
                     GRACZ.czasOslony = pygame.time.get_ticks()
                 else:
-                    GRACZ.hit(100)
+                    GRACZ.hit(rakietaE.moc)
             if not rakietaE.jest:
                 RAKIETY_ENEMY.remove(rakietaE)
 

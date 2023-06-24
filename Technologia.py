@@ -156,6 +156,24 @@ class Technologia:
             self.nazwaStopien1 = "Koszt naprawy 1HP/2$"
             self.nazwaStopien2 = "Koszt naprawy 1HP/1$"
 
+        if numer == 13:
+            self.nazwa = "WIĘKSZA SIŁA RAKIET"
+            self.opis = "Rakiety zadają więcej obrażeń"
+            self.cenaBadania = 4
+            self.cena1 = 1200
+            self.cena2 = 2500
+            self.nazwaStopien1 = "Moc rakiety + 50"
+            self.nazwaStopien2 = "Moc rakiety + 50"
+
+        if numer == 14:
+            self.nazwa = "RAKIETY OBSZAROWE"
+            self.opis = "Eksplozja rakiety razi okoliczne cele"
+            self.cenaBadania = 3
+            self.cena1 = 1500
+            self.cena2 = 2500
+            self.nazwaStopien1 = "Zasięg eksplozji = 50"
+            self.nazwaStopien2 = "Zasięg eksplozji = 100"
+
     def odswiezObraz(self,GRACZ):
         kolor1 = ('lightgreen')
         kolor2 = ('lightsalmon')
@@ -315,3 +333,15 @@ class Technologia:
 
         if self.numer == 12 and self.stopien == 2:
             GRACZ.kosztNaprawy = 1
+
+        if self.numer == 13 and self.stopien == 1:
+            GRACZ.mocRakiet += 50
+
+        if self.numer == 13 and self.stopien == 2:
+            GRACZ.mocRakiet += 50
+
+        if self.numer == 14 and self.stopien == 1:
+            GRACZ.glowica = 50
+
+        if self.numer == 14 and self.stopien == 2:
+            GRACZ.glowica = 100
