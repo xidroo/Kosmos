@@ -44,7 +44,7 @@ class EnemyPrzewodnik:
         self.x = randint(800,850)
         self.y = randint(240,260)
         self.dx = choice([1.8, 1.7, 1.6, -1.8, -1.7, -1.6])
-        self.dy = choice([1.8, 1.7, 1.6, -1.8, -1.7, -1.6])
+        self.dy = choice([1.9,2,2.1,-1.9,-2,-2.1])
         self.granicaX = 980
         self.granicaY = WYSOKOSC - 50
         self.czasOslony = pygame.time.get_ticks()
@@ -55,7 +55,7 @@ class EnemyPrzewodnik:
     def render(self, window, rodzajMisji):
             window.blit(self.grafika, (self.x, self.y))
             if self.oslona:
-                window.blit(self.oslonaG, (self.x - 10, self.y - 10))
+                window.blit(self.oslonaG, (self.x - 12, self.y - 12))
             pasek(window, self.x, self.y - 2, 4, self.szerokosc, self.maxHp, self.hp, 'black', 'red')
 
     def update(self, window, ENEMY,LASERY_ENEMY,RAKIETY_ENEMY, rodzajMisji):

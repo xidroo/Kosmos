@@ -1,10 +1,9 @@
 import pygame
 import math
-from random import randint
-from random import choice
 from Laser import Laser
 from Rakieta import Rakieta
 from Pasek import pasek
+from Gwiazda import Gwiazda
 SZEROKOSC = 1000
 WYSOKOSC = 550
 
@@ -74,9 +73,11 @@ class Gracz:
     prockiAll = 0
     prockiMisja = 0
     __cecha = 0
+    gwiazdy = []
+    numeryPosiadanychGwiazdek = []
 
 
-    def __init__(self,numer,rodzajMisji, TRUDNOSC,hp = None, maxHP = None,maxZlomu = None,zasiegMagnezu = None,rakietyMax = None, szybkoscTakiet = None, maxTemperatura = None, iloscLaserow = None, kosztNaprawy = None, cenaZlomu = None,mocLaseru = None, czasOdnawianiaOslony = None, kasa = None,procki = None, liczbaWykonanychMisji =None,strzalyAll = None,trafioneAll = None,kasaAll = None, prockiAll = None,wirus =None,mocRakiety = None,glowica = None):
+    def __init__(self,numer,rodzajMisji, TRUDNOSC,hp = None, maxHP = None,maxZlomu = None,zasiegMagnezu = None,rakietyMax = None, szybkoscTakiet = None, maxTemperatura = None, iloscLaserow = None, kosztNaprawy = None, cenaZlomu = None,mocLaseru = None, czasOdnawianiaOslony = None, kasa = None,procki = None, liczbaWykonanychMisji =None,strzalyAll = None,trafioneAll = None,kasaAll = None, prockiAll = None,wirus =None,mocRakiety = None,glowica = None,gwiazdy = None):
         if numer == 1:
             if rodzajMisji in [1,2]:
                 self.x = SZEROKOSC//2
@@ -210,6 +211,33 @@ class Gracz:
             for i in range(20):
                 self.zniszczone.append(0)
                 self.zniszczoneMisja.append(0)
+
+            self.gwiazdy.clear()
+            if gwiazdy == None:
+                for i in range(1,31):
+                    self.gwiazdy.append(Gwiazda(i))
+            else:
+                self.gwiazdy = gwiazdy
+
+            self.zaktualizujGwiazdy()
+
+    def zliczGwiazdy(self):
+        wynik = 0
+        for gwiazda in self.gwiazdy:
+            if gwiazda.zaliczone == 1:
+                wynik+=1
+        return wynik
+
+    def zaktualizujGwiazdy(self):
+        for gwiazda in self.gwiazdy:
+            if gwiazda.zaliczone == 0:
+                gwiazda.sprawdzZaliczenie(self)
+
+    def zaktualizujNumeryGwiazdek(self):
+        self.numeryPosiadanychGwiazdek.clear()
+        for gwiazda in self.gwiazdy:
+            if gwiazda.zaliczone:
+                self.numeryPosiadanychGwiazdek.append(gwiazda.numer)
 
     def obroc(self, okno, obraz, x, y, punktX, punktY):
         #global czas

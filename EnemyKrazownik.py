@@ -1,4 +1,5 @@
 import pygame
+import random
 from random import randint
 from random import choice
 from Rakieta import Rakieta
@@ -59,6 +60,13 @@ class EnemyKrazownik:
         if rodzajMisji in [1,2]:
             self.x = randint(50,SZEROKOSC - 200)
             self.y = randint(1,100)
+            if rodzajMisji == 2:
+                if random.choice((1,2)) == 1:
+                    self.x = 388
+                    self.y = 90
+                else:
+                    self.x = 588
+                    self.y = 90
             self.dx = choice([-1.1,1.1,1.2,-1.2,1.3,-1.3])
             self.dy = choice([0.3,0.5,0.2,0.4])
             self.granicaX = 0

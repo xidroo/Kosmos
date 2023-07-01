@@ -1,5 +1,5 @@
 import pygame
-import math
+import random
 from random import randint
 from random import choice
 from Laser import Laser
@@ -35,7 +35,7 @@ class EnemyScigacz:
 
 
 
-    def __init__(self, rodzajMisji):
+    def __init__(self, rodzajMisji,x=0,y=0):
         self.hp = 120
         self.maxHp = 120
         self.odpornosc = 0
@@ -47,6 +47,19 @@ class EnemyScigacz:
         if rodzajMisji in [1,2]:
             self.x = randint(100,SZEROKOSC - 100)
             self.y = randint(20,50)
+            if x != 0:
+                self.x = x
+                self.y = y
+            if rodzajMisji == 2:
+                if random.choice((1,2)) == 1:
+                    self.x = 388
+                    self.y = 90
+                else:
+                    self.x = 588
+                    self.y = 90
+            if x != 0:
+                self.x = x
+                self.y = y
             self.dx = choice([-1.9,-1.8,-1.6,-1.7,-2,2,1.6,1.8,1.7,1.9])
             self.dy = choice([0.9,0.8,0.7,0.6,0.5])
             self.aktualnaDx = self.dx
@@ -56,6 +69,9 @@ class EnemyScigacz:
         if rodzajMisji ==3:
             self.x = randint(SZEROKOSC - 300,SZEROKOSC - 200)
             self.y = randint(100,WYSOKOSC - 100)
+            if x != 0:
+                self.x = x
+                self.y = y
             self.dx = 1.7
             self.dy = 0.8
             self.aktualnaDx = self.dx
@@ -81,6 +97,9 @@ class EnemyScigacz:
             self.grafika.set_colorkey('white')
             self.szerokosc = self.grafika.get_width()
             self.wysokosc = self.grafika.get_height()
+            if x != 0:
+                self.x = x
+                self.y = y
 
 
     def render(self, window, rodzajMisji):

@@ -11,6 +11,7 @@ from EnemyBabowiec import EnemyBabowiec
 from EnemyPrzewodnik import EnemyPrzewodnik
 from EnemyWieza import EnemyWieza
 from EnemyPancernik import EnemyPancernik
+from EnemyHybryd import EnemyHybryd
 from Beczka import Beczka
 CZARNY = (0,0,0)
 BIALY = (255,255,255)
@@ -37,6 +38,7 @@ class Misja:
     czasUcieczki = 0
     iloscWiez = 0#tylko fabrykator
     beczki = [1,1]#tylko fabrykator
+    wiodacyPrzeciwnik = 1#tylko fabrykator
     grafiki = []
     grafiki.append(pygame.image.load("Grafika\Misje\misja1.png"))
     grafiki.append(pygame.image.load("Grafika\Misje\misja2.png"))
@@ -73,22 +75,22 @@ class Misja:
         if rodzajMisji == 4:
             self.rodzajTekst = "Szwadron"
             self.kolor = (115,106,255)
-            self.czasDoUcieczki = 2000 * 60 - min(1000,(poziom-1)*500)
+            self.czasDoUcieczki = max(60000,120000 - poziom*10000)
             self.aktualnyCzasDoUcieczki = self.czasDoUcieczki
 
 
     def inicjujWrogow(self,TRUDNOSC):
         self.przeciwnicy.clear()
 
-
-        zwyklaki = min(3+TRUDNOSC,2+self.poziom)
-        mysliwce = min(2+TRUDNOSC,self.poziom+1)
-        kanonierki = min(2+TRUDNOSC,self.poziom-1)
-        scigacze = min(1+TRUDNOSC,self.poziom-2)
-        babowce = min(1+TRUDNOSC,self.poziom)
-        kargo = min(1+TRUDNOSC,self.poziom)
-        krazownik = min(1+TRUDNOSC,self.poziom-3)
-        pancerniki = min(0+TRUDNOSC,self.poziom-4)
+        self.przeciwnicy.append(EnemyHybryd(self.rodzaj))
+        zwyklaki = min(3+TRUDNOSC+self.poziom//10,2+self.poziom)
+        mysliwce = min(2+TRUDNOSC+self.poziom//10,self.poziom+1)
+        kanonierki = min(2+TRUDNOSC+self.poziom//10,self.poziom-1)
+        scigacze = min(1+TRUDNOSC+self.poziom//10,self.poziom-2)
+        babowce = min(1+TRUDNOSC+self.poziom//10,self.poziom)
+        kargo = min(1+TRUDNOSC+self.poziom//10,self.poziom)
+        krazownik = min(1+TRUDNOSC+self.poziom//10,self.poziom-3)
+        pancerniki = min(0+TRUDNOSC+self.poziom//10,self.poziom-4)
         if self.rodzaj == 4:
             self.przeciwnicy.append(EnemyPrzewodnik())
         if self.rodzaj == 1:  # babowiecd
@@ -99,9 +101,20 @@ class Misja:
                 self.przeciwnicy.append(EnemyCargo())
 
         if self.rodzaj == 2: #atak na fabrykator
-           zwyklaki -= 2
-           mysliwce -= 1
-           kanonierki -= 1
+           zwyklaki = mysliwce = kanonierki = scigacze = krazownik = pancerniki = 0
+           self.wiodacyPrzeciwnik = random.randint(1,10) + self.poziom
+           if self.wiodacyPrzeciwnik in (1,2,3):
+               zwyklaki = 5 + self.poziom + TRUDNOSC
+           elif self.wiodacyPrzeciwnik in (4,5):
+               mysliwce = 3 + self.poziom + TRUDNOSC
+           elif self.wiodacyPrzeciwnik in (6,7):
+               kanonierki = 1 + self.poziom + TRUDNOSC
+           elif self.wiodacyPrzeciwnik in (8,9):
+               scigacze = 1 + self.poziom + TRUDNOSC
+           elif self.wiodacyPrzeciwnik == 10:
+               krazownik = self.poziom -1 + TRUDNOSC
+           elif self.wiodacyPrzeciwnik >= 11:
+               scigacze = self.poziom - 2 + TRUDNOSC
 
 
            self.przeciwnicy.append(Beczka( 300, 5))

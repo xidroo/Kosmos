@@ -51,7 +51,7 @@ class Technologia:
         if numer == 1:
             self.nazwa = "DODATKOWE LASERY"
             self.opis = "Dodaj dronowi kolejne lasery, ale kosztem  zwiększenia temperatury"
-            self.cenaBadania = 3
+            self.cenaBadania = 4
             self.cena1 = 1500
             self.cena2 = 2500
             self.nazwaStopien1 = "Ilość laserów + 1"
@@ -123,7 +123,7 @@ class Technologia:
         if numer == 9:
             self.nazwa = "WIĘKSZA MOC LASERU"
             self.opis = "Zwiększ obrażenia zadawane przez lasery, ale i generowaną temperaturę"
-            self.cenaBadania = 5
+            self.cenaBadania = 4
             self.cena1 = 1500
             self.cena2 = 3000
             self.nazwaStopien1 = "Moc laseru +5"

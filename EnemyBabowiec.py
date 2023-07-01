@@ -18,10 +18,10 @@ class EnemyBabowiec:
     granicaY = 0
     grafika = pygame.image.load("Grafika\Enemy\enemy6.png")
     bombaD = pygame.mixer.Sound("Dzwieki\sfx_sounds_falling7.wav")
-    oslonaD = pygame.mixer.Sound("Dzwieki\sfx_sounds_interaction20.wav")
     grafika.set_colorkey('white')
     szerokosc = grafika.get_width()
     wysokosc = grafika.get_height()
+    oslonaD = pygame.mixer.Sound("Dzwieki\sfx_sounds_interaction20.wav")
     kopia = pygame.image.load("Grafika\spr_shield.png")
     oslonaG = pygame.transform.scale(kopia, (szerokosc + 20, wysokosc + 20))
     odpornosc = 0
@@ -35,8 +35,8 @@ class EnemyBabowiec:
     czasStrzalu = 0
     zapamietaneDx = 0
     zapamietaneDy = 0
-    czasOslony = 0
     czasStrzalu = 0
+    czasOslony = 0
     czasOdnawianiaOslony = 0
     oslona = False
 

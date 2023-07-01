@@ -28,7 +28,7 @@ class Enemy:
     kat = 0
 
 
-    def __init__(self, rodzajMisji):
+    def __init__(self, rodzajMisji,x = 0,y = 0):
         self.hp = 50
         self.maxHp = 50
         self.odpornosc = 0
@@ -37,6 +37,10 @@ class Enemy:
         if rodzajMisji in [1,2]:
             self.x = randint(50,SZEROKOSC - 100)
             self.y = randint(1,100)
+            if x != 0:
+                self.x = x
+                self.y = y
+
             if rodzajMisji == 2:
                 if random.choice((1,2)) == 1:
                     self.x = 388
@@ -44,6 +48,9 @@ class Enemy:
                 else:
                     self.x = 588
                     self.y = 90
+                if x != 0:
+                    self.x = x
+                    self.y = y
             self.dx = choice([-1,-1.5,-2,0,1,2,1.5])
             self.dy = choice([0.5,0.4,0.3,0.2,0.1])
             self.granicaX = 0
@@ -52,6 +59,9 @@ class Enemy:
         if rodzajMisji == 3:
             self.x = randint(SZEROKOSC-200, SZEROKOSC - 100)
             self.y = randint(100, WYSOKOSC-300)
+            if x != 0:
+                self.x = x
+                self.y = y
             self.dx = choice([-1, -1.5, -2, 1, 2, 1.5])
             self.dy = choice([0.5, 0.4, 0.3, 0, -0.5, -0.4, -0.3])
             self.granicaX = 20
@@ -73,6 +83,9 @@ class Enemy:
             self.grafika.set_colorkey('white')
             self.szerokosc = self.grafika.get_width()
             self.wysokosc = self.grafika.get_height()
+            if x != 0:
+                self.x = x
+                self.y = y
 
 
 

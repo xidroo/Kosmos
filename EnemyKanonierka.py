@@ -1,5 +1,5 @@
 import pygame
-import math
+import random
 from random import randint
 from random import choice
 from Laser import Laser
@@ -44,6 +44,13 @@ class EnemyKanonierka:
         if rodzajMisji in [1,2]:
             self.x = randint(100,SZEROKOSC - 120)
             self.y = randint(1,50)
+            if rodzajMisji == 2:
+                if random.choice((1,2)) == 1:
+                    self.x = 388
+                    self.y = 90
+                else:
+                    self.x = 588
+                    self.y = 90
             self.dx = choice([-1.9,-1.8,-1.6,-1.7,-2,2,1.6,1.8,1.7,1.9])
             self.dy = choice([0.5,0.4,0.3,0.2,0.1])
             self.aktualnaDx = self.dx

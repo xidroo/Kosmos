@@ -9,7 +9,7 @@ from Pasek import pasek
 SZEROKOSC = 1000
 WYSOKOSC = 550
 
-class EnemyPancernik:
+class EnemyHybryd:
     x = 0
     y = 0
     dx = 0
@@ -18,48 +18,44 @@ class EnemyPancernik:
     maxHp = 0
     granicaX = 0
     granicaY = 0
-    grafika1 = pygame.image.load("Grafika\Enemy\enemy13_1.png")
-    grafika2 = pygame.image.load("Grafika\Enemy\enemy13_2.png")
-    grafika = pygame.image.load("Grafika\Enemy\enemy13_1.png")
+    grafika = pygame.image.load("Grafika\Enemy\enemy14.png")
     rakietaD = pygame.mixer.Sound("Dzwieki\sfx_sounds_falling11.wav")
     laserD = pygame.mixer.Sound("Dzwieki\Laser_09.wav")
     laserD.set_volume(0.1)
     grafika.set_colorkey('white')
-    grafika1.set_colorkey('white')
-    grafika2.set_colorkey('white')
     szerokosc = grafika.get_width()
     wysokosc = grafika.get_height()
-    odpornosc = 2
+    oslonaD = pygame.mixer.Sound("Dzwieki\sfx_sounds_interaction20.wav")
+    kopia = pygame.image.load("Grafika\spr_shield.png")
+    oslonaG = pygame.transform.scale(kopia, (szerokosc + 20, wysokosc + 20))
+    odpornosc = 0
     czas = 0
     czasZmianyKierunku = 0
-    czasPomiedzyLaserami = 6000
-    seria = False
-    czasStrzalu = 0
+    czasPomiedzyLaserami = 1500
     jest = True
-    rodzaj = 13
+    rodzaj = 14
     kat = 0
     stop = False
-    czasStop = 0
-    czasSerii = 0
+    czasOslony = 0
+    czasOdnawianiaOslony = 0
+    oslona = False
+
 
 
 
     def __init__(self, rodzajMisji):
-        self.hp = 330
-        self.maxHp = 330
-        self.odpornosc = 2
+        self.hp = 420
+        self.maxHp = 420
+        self.odpornosc = 0
         self.czas = pygame.time.get_ticks()
         self.czasZmianyKierunku = pygame.time.get_ticks()
+        self.czasStrzalu = pygame.time.get_ticks()
         self.jest = True
         self.stop = False
-        self.czasStop = pygame.time.get_ticks()
-        self.czasStrzalu = pygame.time.get_ticks()
-        self.czasPomiedzyLaserami = 6000
-        self.seria = False
-        self.czasSerii = pygame.time.get_ticks()
+        self.czasPomiedzyLaserami = 1500
         if rodzajMisji in [1,2]:
             self.x = randint(100,SZEROKOSC - 100)
-            self.y = randint(1,100)
+            self.y = randint(10,50)
             if rodzajMisji == 2:
                 if random.choice((1,2)) == 1:
                     self.x = 388
@@ -67,91 +63,66 @@ class EnemyPancernik:
                 else:
                     self.x = 588
                     self.y = 90
-            self.dx = choice([0.3,0.2,0.4,0.35,-0.3,-0.2,-0.4,-0.35])
-            self.dy = choice([0.3,0.2,0.4,0.35])
+            self.dx = choice([0.3,0.2,0.35,-0.3,-0.2,-0.35])
+            self.dy = choice([0.3,0.2,0.1,0.08])
             self.granicaX = 0
             self.granicaY = 150
             self.kat = 0
         if rodzajMisji == 3:
-            self.x = randint(SZEROKOSC-300,SZEROKOSC - 300)
+            self.x = randint(SZEROKOSC-300,SZEROKOSC - 150)
             self.y = randint(10,WYSOKOSC - 300)
-            self.dx = choice([-0.3,-0.4,0.4,0.3])
-            self.dy = choice([0.8,0.9,0.7,-0.7,-0.8,-0.9])
-            self.aktualnaDx = self.dx
-            self.aktualnaDy = self.dy
+            self.dx = choice([0.3,0.2,0.1,0.08])
+            self.dy = choice([0.3,0.2,0.35,-0.3,-0.2,-0.35])
             self.granicaX = SZEROKOSC//2+200
             self.granicaY = WYSOKOSC - 20
-            kopia = pygame.transform.rotate(self.grafika1, -90)
-            self.grafika1 = kopia
-            self.grafika1.set_colorkey('white')
-            self.grafika = self.grafika1
-            kopia = pygame.transform.rotate(self.grafika2, -90)
-            self.grafika2 = kopia
-            self.grafika2.set_colorkey('white')
-            self.grafika = self.grafika1
+            kopia = pygame.transform.rotate(self.grafika, -90)
+            self.grafika = kopia
+            self.grafika.set_colorkey('white')
             self.szerokosc = self.grafika.get_width()
             self.wysokosc = self.grafika.get_height()
         if rodzajMisji == 4:
-            self.x = 0
-            self.y = 0
-            self.dx = 1
-            self.dy = -0.4
-            self.aktualnaDx = self.dx
-            self.aktualnaDy = self.dy
-            self.granicaX = 400
-            self.granicaY = WYSOKOSC
-            kopia = pygame.transform.rotate(self.grafika1, -90)
-            self.grafika1 = kopia
-            self.grafika1.set_colorkey('white')
-            self.grafika = self.grafika1
-            kopia = pygame.transform.rotate(self.grafika2, -90)
-            self.grafika2 = kopia
-            self.grafika2.set_colorkey('white')
-            self.grafika = self.grafika1
+            self.x = SZEROKOSC - 300
+            self.y = WYSOKOSC//2
+            self.dx = 0.7
+            self.dy = 0.35
+            self.granicaX = SZEROKOSC//2+200
+            self.granicaY = WYSOKOSC - 20
+            kopia = pygame.transform.rotate(self.grafika, -90)
+            self.grafika = kopia
+            self.grafika.set_colorkey('white')
             self.szerokosc = self.grafika.get_width()
             self.wysokosc = self.grafika.get_height()
 
+        self.czasOslony = pygame.time.get_ticks()
+        self.oslona = False
+        self.czasOdnawianiaOslony = 8000
+
 
     def render(self, window, rodzajMisji):
-            if self.odpornosc == 2:
-                window.blit(self.grafika1, (self.x, self.y))
-            elif self.odpornosc == 0:
-                window.blit(self.grafika2, (self.x, self.y))
 
+            window.blit(self.grafika, (self.x, self.y))
+            if self.oslona:
+                window.blit(self.oslonaG, (self.x - 10, self.y - 10))
             pasek(window, self.x, self.y - 2, 4, self.szerokosc, self.maxHp, self.hp, 'black', 'red')
 
 
     def update(self, window, ENEMY,LASERY_ENEMY,RAKIETY_ENEMY, rodzajMisji):
+        self.x += self.dx
+        self.y += self.dy
 
-        if not self.stop:
-            self.x += self.dx
-            self.y += self.dy
+        if not self.oslona and pygame.time.get_ticks() - self.czasOslony > self.czasOdnawianiaOslony:
+            self.oslona = True
+            self.oslonaD.play()
 
         if rodzajMisji in [1,2]:
-            if randint(1,1000) <= 10 and pygame.time.get_ticks() - self.czasZmianyKierunku > randint(5000,7000) :
+            if randint(1,1000) <= 8 and pygame.time.get_ticks() - self.czasZmianyKierunku > randint(5000,7000) :
                  self.czasZmianyKierunku = pygame.time.get_ticks()
                  self.dx = - self.dx
 
         if rodzajMisji == 3:
-            if randint(1,1000) <= 10 and pygame.time.get_ticks() - self.czasZmianyKierunku > randint(5000,7000) :
+            if randint(1,1000) <= 8 and pygame.time.get_ticks() - self.czasZmianyKierunku > randint(5000,7000) :
                  self.czasZmianyKierunku = pygame.time.get_ticks()
                  self.dy = - self.dy
-
-        if randint(1,100) < 15 and pygame.time.get_ticks() - self.czas > 7000 and not self.stop:
-            self.stop = True
-            self.czasStop = pygame.time.get_ticks()
-
-
-        if pygame.time.get_ticks() - self.czasStop > 600 and self.stop:
-            self.czas = pygame.time.get_ticks()
-            self.stop = False
-            self.rakietaD.play()
-            if rodzajMisji in [1, 2]:
-                RAKIETY_ENEMY.append(Rakieta(self.x+self.szerokosc//2,self.y+self.wysokosc//2-20,0,3,180,100,rodzajMisji))
-                RAKIETY_ENEMY.append(Rakieta(self.x+self.szerokosc//2,self.y+self.wysokosc//2+30,0,3,180,100,rodzajMisji))
-            if rodzajMisji in [3, 4]:
-                RAKIETY_ENEMY.append(Rakieta(self.x , self.y + self.wysokosc // 2 , -3, 0, 90,100, rodzajMisji))
-                RAKIETY_ENEMY.append(Rakieta(self.x + 50, self.y + self.wysokosc // 2 , -3, 0, 90,100, rodzajMisji))
 
         if rodzajMisji in [1, 2]:
             if self.x+self.szerokosc > SZEROKOSC - 10 or self.x < 10:
@@ -180,22 +151,16 @@ class EnemyPancernik:
 
         if pygame.time.get_ticks() - self.czasStrzalu > self.czasPomiedzyLaserami:
             self.czasStrzalu = pygame.time.get_ticks()
-            if not self.seria:
-                self.czasSerii = pygame.time.get_ticks()
-                self.czasPomiedzyLaserami = 300
-                self.seria = True
             self.laserD.play()
 
             if rodzajMisji in [1,2]:
                 LASERY_ENEMY.append(Laser(self.x+10,self.y+self.wysokosc,0,5,0,rodzajMisji,15))
                 LASERY_ENEMY.append(Laser(self.x+self.szerokosc - 10,self.y+self.wysokosc,0,5,0,rodzajMisji,15))
+                LASERY_ENEMY.append(Laser(self.x+self.szerokosc//2,self.y+self.wysokosc+20,0,5,0,rodzajMisji,10))
             if rodzajMisji in [3,4]:
                 LASERY_ENEMY.append(Laser(self.x,self.y+10,-5,0,-90,rodzajMisji,15))
                 LASERY_ENEMY.append(Laser(self.x,self.y+self.wysokosc-10,-5,0,-90,rodzajMisji,15))
-
-        if self.seria and pygame.time.get_ticks() - self.czasSerii > 900:
-            self.seria = False
-            self.czasPomiedzyLaserami = 6000
+                LASERY_ENEMY.append(Laser(self.x + 20,self.y+self.wysokosc//2,-5,0,-90,rodzajMisji,10))
 
 
         self.render(window,rodzajMisji)

@@ -29,15 +29,18 @@ class EnemyMysliwiec:
     rodzaj = 2
 
 
-    def __init__(self, rodzajMisji):
+    def __init__(self, rodzajMisji,x= 0,y = 0):
         self.hp = 100
         self.maxHp = 100
         self.odpornosc = 0
         self.czas = pygame.time.get_ticks()
         self.jest = True
-        if rodzajMisji in [1,2]:
+        if rodzajMisji in [1,2] :
             self.x = randint(50,SZEROKOSC - 50)
             self.y = randint(1,100)
+            if x != 0:
+                self.x = x
+                self.y = y
             self.dx = choice([-1.8,-1.5,-1.7,-2,2,1.5,1.8,1.7])
             self.dy = choice([0.5,0.4,0.3,0.2,0.1])
             if rodzajMisji == 2:
@@ -47,11 +50,17 @@ class EnemyMysliwiec:
                 else:
                     self.x = 588
                     self.y = 90
+            if x != 0:
+                self.x = x
+                self.y = y
             self.granicaX = 0
             self.granicaY = 350
         if rodzajMisji == 3:
             self.x = randint(SZEROKOSC - 300, SZEROKOSC - 100)
             self.y = randint(1, WYSOKOSC - 200)
+            if x != 0:
+                self.x = x
+                self.y = y
             self.dx = choice([-1.8, -1.5, -1.7, -2, 2, 1.5, 1.8, 1.7])
             self.dy = choice([0.6, 0.5, 0.4, 0.7,-0.6, -0.5, -0.4, -0.7])
             self.granicaX = 300
@@ -73,6 +82,9 @@ class EnemyMysliwiec:
             self.grafika.set_colorkey('white')
             self.szerokosc = self.grafika.get_width()
             self.wysokosc = self.grafika.get_height()
+            if x != 0:
+                self.x = x
+                self.y = y
 
 
     def render(self, window, rodzajMisji):

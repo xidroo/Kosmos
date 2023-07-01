@@ -9,6 +9,7 @@ from Technologia import Technologia
 from EnemyMysliwiec import EnemyMysliwiec
 from EnemyKanonierka import EnemyKanonierka
 from EnemyScigacz import EnemyScigacz
+from EnemyPancernik import EnemyPancernik
 from Gracz import Gracz
 from Button import Button
 from Wybuch import Wybuch
@@ -34,6 +35,12 @@ grafikaEnemyPrzewodnik = pygame.image.load("Grafika\Enemy\enemy10.png")
 grafikaEnemyPancernik = pygame.image.load("Grafika\Enemy\enemy13_1.png")
 grafikaEnemyWieza = pygame.image.load("Grafika\Enemy\wieza.png")
 grafikaEnemyBeczka = pygame.image.load("Grafika\Enemy\\beczkaL.png")
+grafikaEnemyHybryda = pygame.image.load("Grafika\Enemy\\enemy14.png")
+grafikaGwiazda1 = pygame.image.load("Grafika\gwiazda1m.png")
+grafikaGwiazda2 = pygame.image.load("Grafika\gwiazda2m.png")
+grafikaGwiazda3 = pygame.image.load("Grafika\gwiazda3m.png")
+grafikaGwiazda4 = pygame.image.load("Grafika\gwiazda4m.png")
+grafikaZnak = pygame.image.load("Grafika\znak.png")
 kopia = pygame.transform.rotate(grafikaEnemyPrzewodnik,90)
 grafikaEnemyPrzewodnik = kopia
 kopia = pygame.transform.rotate(grafikaEnemyCargo,90)
@@ -52,6 +59,12 @@ grafikaEnemyPrzewodnik.set_colorkey('white')
 grafikaEnemyWieza.set_colorkey('white')
 grafikaEnemyBeczka.set_colorkey('white')
 grafikaEnemyPancernik.set_colorkey('white')
+grafikaEnemyHybryda.set_colorkey('white')
+grafikaGwiazda1.set_colorkey('white')
+grafikaGwiazda2.set_colorkey('white')
+grafikaGwiazda3.set_colorkey('white')
+grafikaGwiazda4.set_colorkey('white')
+grafikaZnak.set_colorkey('white')
 
 name = ""
 db = sqlite3.connect("baza.db")
@@ -59,13 +72,15 @@ cursor = db.cursor()
 cursor.execute("CREATE TABLE IF NOT EXISTS gracze(id integer PRIMARY KEY AUTOINCREMENT, name text,aktualneHP integer, maxHP integer, maxZlomu integer, zasiegMagnezu integer, rakietyMax integer,szybkoscRakiet integer,maxTemperatura integer,iloscLaserow integer,kosztNaprawy integer,cenaZlomu integer,mocLaseru integer,czasOdnawianiaOslony integer,kasa integer,procki integer,liczbaWykonanychMisji integer,trudnosc integer,strzalyAll integer,trafioneAll integer,kasaAll integer,prockiAll integer,wirus integer,mocRakiet integer,glowica integer )")
 cursor.execute("CREATE TABLE IF NOT EXISTS technologie(id integer PRIMARY KEY AUTOINCREMENT,gracz text,t0 integer,t1 integer,t2 integer,t3 integer,t4 integer,t5 integer,t6 integer,t7 integer,t8 integer,t9 integer,t10 integer,t11 integer,t12 integer,t13 integer,t14 integer)")
 cursor.execute("CREATE TABLE IF NOT EXISTS zniszczone(id integer PRIMARY KEY AUTOINCREMENT,gracz text,w0 integer,w1 integer,w2 integer,w3 integer,w4 integer,w5 integer,w6 integer,w7 integer,w8 integer,w9 integer,w10 integer,w11 integer,w12 integer,w13 integer,w14 integer,w15 integer,w16 integer,w17 integer,w18 integer,w19 integer)")
+cursor.execute("CREATE TABLE IF NOT EXISTS gwiazdy(id integer PRIMARY KEY AUTOINCREMENT,gracz text,g0 integer,g1 integer,g2 integer,g3 integer,g4 integer,g5 integer,g6 integer,g7 integer,g8 integer,g9 integer,g10 integer,g11 integer,g12 integer,g13 integer,g14 integer,g15 integer,g16 integer,g17 integer,g18 integer,g19 integer,g20 integer,g21 integer,g22 integer,g23 integer,g24 integer,g25 integer,g26 integer,g27 integer,g28 integer,g29 integer,g30 integer)")
 cursor.execute("SELECT COUNT(*) FROM gracze")
 iloscZapisow = cursor.fetchone()[0]
 if iloscZapisow == 0:
     for i in range(5):
-        cursor.execute("INSERT INTO gracze VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",["WOLNE",200,200,15,200,5,3,100,1,3,10,10,10,5000,3,0,1,0,0,0,0,0,100,0])
-        cursor.execute("INSERT INTO technologie VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ["WOLNE",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+        cursor.execute("INSERT INTO gracze VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",["WOLNE",200,200,15,200,5,3,100,1,3,10,10,10000,5000,3,0,1,0,0,0,0,0,100,0])
+        cursor.execute("INSERT INTO technologie VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ["WOLNE",-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1])
         cursor.execute("INSERT INTO zniszczone VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ["WOLNE",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+        cursor.execute("INSERT INTO gwiazdy VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ["WOLNE",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
 
 zapisy = []
 iloscZapisow = 0
@@ -80,7 +95,6 @@ def przygotujPrzyciskiOdczyt():
     if iloscZapisow > 0:
         cursor.execute("SELECT name,liczbaWykonanychMisji,TRUDNOSC FROM gracze WHERE name NOT LIKE ?",["WOLNE"])
         zapisy = cursor.fetchall()
-        print(zapisy)
         for zapis in zapisy:
             text = "Gracz: " + zapis[0] + "   Wykonane misje: " + str(zapis[1]) + "   Poziom: "
             if zapis[2] == 1:
@@ -120,66 +134,109 @@ def losujNoweMisje(wykonaneMisje):
         misje.append(Misja(random.choice((1,2,3,4)),random.randint(1,5)))
         misje.append(Misja(random.choice((1,2,3,4)),5))
         misje.append(Misja(random.choice((1,2,3,4)),random.randint(3,5)))
-    if wykonaneMisje >= 15:
-        misje.append(Misja(random.choice((1,2,3,4)),random.randint(1,6)))
-        misje.append(Misja(random.choice((1,2,3,4)),6))
-        misje.append(Misja(random.choice((1,2,3,4)),random.randint(3,6)))
+    if wykonaneMisje >= 15 and wykonaneMisje < 17:
+        misje.append(Misja(random.choice((1,2,3,4)),random.randint(1,7)))
+        misje.append(Misja(random.choice((1,2,3,4)),7))
+        misje.append(Misja(random.choice((1,2,3,4)),random.randint(3,7)))
+    if wykonaneMisje >= 17 and wykonaneMisje < 19:
+        misje.append(Misja(random.choice((1,2,3,4)),random.randint(1,8)))
+        misje.append(Misja(random.choice((1,2,3,4)),8))
+        misje.append(Misja(random.choice((1,2,3,4)),random.randint(4,8)))
+    if wykonaneMisje >= 19 and wykonaneMisje < 21:
+        misje.append(Misja(random.choice((1,2,3,4)),random.randint(1,9)))
+        misje.append(Misja(random.choice((1,2,3,4)),9))
+        misje.append(Misja(random.choice((1,2,3,4)),random.randint(5,9)))
+    if wykonaneMisje >= 21:
+        misje.append(Misja(random.choice((1,2,3,4)),random.randint(1,10)))
+        misje.append(Misja(random.choice((1,2,3,4)),10))
+        misje.append(Misja(random.choice((1,2,3,4)),random.randint(6,10)))
 
     random.shuffle(misje)
     return misje
+def wyswietlStatystykeZniszczonych(listaZniszczonychAll = [],listaZniszczonychMisja = [] ,misia = False):
+    if not misia:
+        okno.blit(fontMala.render("ZNISZCZENI PRZECIWNICY", True, 'white'), (570, 55))
+        listaZniszczonych = listaZniszczonychAll
+    else:
+        listaZniszczonych = listaZniszczonychMisja
 
-def wyswietlStatystykeZniszczonych(listaZniszczonych = []):
-    rozmiar = len(listaZniszczonych)
-    x = 400
-    y = 100
-    x1 = 690
-    y1 = 100
-    for i in range(1,rozmiar):
-        if listaZniszczonych[i] != 0:
-            if i == 1:
-                okno.blit(grafikaEnemy,(x,y))
-                okno.blit(fontMala.render(" Zwyklak: " +  str(listaZniszczonych[1]),True,'white'),(x+70,y))
-                y += 70
-            if i == 2:
-                okno.blit(grafikaEnemyMysliwiec,(x,y))
-                okno.blit(fontMala.render(" Myśliwiec: " + str(listaZniszczonych[2]),True,'white'),(x+70,y))
-                y += 70
-            if i == 3:
-                okno.blit(grafikaEnemyKanonierka,(x,y))
-                okno.blit(fontMala.render(" Kanonierka: " + str(listaZniszczonych[3]),True,'white'),(x+70,y))
-                y += 70
-            if i == 4:
-                okno.blit(grafikaEnemyScigacz,(x,y))
-                okno.blit(fontMala.render(" Ścigacz: " + str(listaZniszczonych[4]),True,'white'),(x+70,y))
-                y += 70
-            if i == 6:
-                okno.blit(grafikaEnemyBabowiec,(x,y))
-                okno.blit(fontMala.render(" Bombowiec: " + str(listaZniszczonych[6]),True,'white'),(x+70,y))
-                y += 70
-            if i == 8:
-                okno.blit(grafikaEnemyCargo,(x,y))
-                okno.blit(fontMala.render(" Cargo: " + str(listaZniszczonych[8]),True,'white'),(x+70,y))
-                y += 70
-            if i == 9:
-                okno.blit(grafikaEnemyKrazownik,(x1,y1))
-                okno.blit(fontMala.render(" Krążownik: " + str(listaZniszczonych[9]),True,'white'),(x1+90,y1))
-                y1 += 80
-            if i == 10:
-                okno.blit(grafikaEnemyPrzewodnik,(x1+20,y1))
-                okno.blit(fontMala.render(" Przewodnik: " + str(listaZniszczonych[10]),True,'white'),(x1+90,y1))
-                y1 += 70
-            if i == 11:
-                okno.blit(grafikaEnemyWieza,(x1+20,y1))
-                okno.blit(fontMala.render(" Wieża: " + str(listaZniszczonych[11]),True,'white'),(x1+90,y1))
-                y1 += 70
-            if i == 12:
-                okno.blit(grafikaEnemyBeczka,(x1+20,y1))
-                okno.blit(fontMala.render(" Kontener: " + str(listaZniszczonych[12]),True,'white'),(x1+90,y1))
-                y1 += 70
-            if i == 13:
-                okno.blit(grafikaEnemyPancernik,(x1+10,y1))
-                okno.blit(fontMala.render(" Pancernik: " + str(listaZniszczonych[13]),True,'white'),(x1+100,y1))
-                y1 += 70
+    if listaZniszczonychAll[1] == 0:
+        okno.blit(grafikaZnak, (400, 100))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (470, 100))
+    else:
+        okno.blit(grafikaEnemy, (400, 100))
+        okno.blit(fontMala.render(" Zwyklak: " + str(listaZniszczonych[1]), True, 'white'), (470, 100))
+
+    if listaZniszczonychAll[2] == 0:
+        okno.blit(grafikaZnak, (400, 150))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (470, 150))
+    else:
+        okno.blit(grafikaEnemyMysliwiec, (395, 150))
+        okno.blit(fontMala.render(" Myśliwiac: " + str(listaZniszczonych[2]), True, 'white'), (470, 150))
+
+    if listaZniszczonychAll[3] == 0:
+        okno.blit(grafikaZnak, (400, 200))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (470, 205))
+    else:
+        okno.blit(grafikaEnemyScigacz, (395, 200))
+        okno.blit(fontMala.render(" Ścigacz: " + str(listaZniszczonych[3]), True, 'white'), (470, 205))
+
+    if listaZniszczonychAll[4] == 0:
+        okno.blit(grafikaZnak, (400, 255))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (470, 260))
+    else:
+        okno.blit(grafikaEnemyKanonierka, (395, 255))
+        okno.blit(fontMala.render(" Kanonierka: " + str(listaZniszczonych[4]), True, 'white'), (470, 260))
+
+    if listaZniszczonychAll[6] == 0:
+        okno.blit(grafikaZnak, (400, 320))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (470, 325))
+    else:
+        okno.blit(grafikaEnemyBabowiec, (395, 320))
+        okno.blit(fontMala.render(" Bombowiec: " + str(listaZniszczonych[6]), True, 'white'), (470, 325))
+
+    if listaZniszczonychAll[8] == 0:
+        okno.blit(grafikaZnak, (400, 380))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (470, 385))
+    else:
+        okno.blit(grafikaEnemyCargo, (395, 380))
+        okno.blit(fontMala.render(" Cargo: " + str(listaZniszczonych[8]), True, 'white'), (470, 385))
+
+    if listaZniszczonychAll[10] == 0:
+        okno.blit(grafikaZnak, (400, 440))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (470, 445))
+    else:
+        okno.blit(grafikaEnemyPrzewodnik, (405, 440))
+        okno.blit(fontMala.render(" Przewodnik: " + str(listaZniszczonych[10]), True, 'white'), (470, 445))
+
+    if listaZniszczonychAll[11] == 0:
+        okno.blit(grafikaZnak, (400, 500))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (470, 505))
+    else:
+        okno.blit(grafikaEnemyWieza, (400, 500))
+        okno.blit(fontMala.render(" Wieża: " + str(listaZniszczonych[11]), True, 'white'), (470, 505))
+
+    if listaZniszczonychAll[9] == 0:
+        okno.blit(grafikaZnak, (700, 100))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (770, 105))
+    else:
+        okno.blit(grafikaEnemyKrazownik, (700, 100))
+        okno.blit(fontMala.render(" Krążownik: " + str(listaZniszczonych[9]), True, 'white'), (790, 105))
+
+    if listaZniszczonychAll[13] == 0:
+        okno.blit(grafikaZnak, (700, 180))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (770, 185))
+    else:
+        okno.blit(grafikaEnemyPancernik, (700, 180))
+        okno.blit(fontMala.render(" Pancernik: " + str(listaZniszczonych[13]), True, 'white'), (790, 185))
+
+    if listaZniszczonychAll[14] == 0:
+        okno.blit(grafikaZnak, (700, 260))
+        okno.blit(fontMala.render(" ?????????", True, 'white'), (770, 265))
+    else:
+        okno.blit(grafikaEnemyHybryda, (700, 225))
+        okno.blit(fontMala.render(" Hybryda: " + str(listaZniszczonych[14]), True, 'white'), (790, 265))
+
 
 def generujZlom(enemy,ZLOMY,PROCKI):
     ilosc_zlomu = 1
@@ -211,6 +268,11 @@ def generujZlom(enemy,ZLOMY,PROCKI):
     if enemy.rodzaj == 13:
         ilosc_zlomu = random.randint(10, 14)
         PROCKI.append(Procek(enemy.x, enemy.y))
+    if enemy.rodzaj == 14:
+        ilosc_zlomu = random.randint(8, 12)
+        PROCKI.append(Procek(enemy.x, enemy.y))
+
+
     for i in range(ilosc_zlomu):
         ZLOMY.append(Zlom(enemy.x,enemy.y))
 
@@ -249,6 +311,7 @@ czas_gry = pygame.time.get_ticks()
 # 9 - ZAPISZ GRĘ
 # 10 - WCZYTAJ GRĘ
 # 11 - NOWA GRA
+# 12 - GWIAZY
 MUZA = False
 KONIEC_MISJI = False
 czasKoniec = pygame.time.get_ticks()
@@ -263,6 +326,7 @@ iloscTechnologii = 15
 TECHY = []
 TECHY_WSZYSTKIE = []
 GRA_ZAPISANA =False
+AKTUALNA_LICZBA_GWIAZDEK = 0
 
 
 
@@ -285,7 +349,9 @@ zlomD = pygame.mixer.Sound("Dzwieki\sfx_sounds_impact2.wav")
 procekD = pygame.mixer.Sound("Dzwieki\sfx_coin_double4.wav")
 produkcjaFabrykaD = pygame.mixer.Sound("Dzwieki\sfx_sounds_interaction12.wav")
 muzyka1 = pygame.mixer.Sound("Muzyka\\n-Dimensions (Main Theme - Retro Ver.mp3")
-muzyka2 = muzyka1
+muzyka2 = pygame.mixer.Sound("Muzyka\\Orbital Colossus.mp3")
+muzyka3 = pygame.mixer.Sound("Muzyka\\fight.ogg")
+muzykaMENU = pygame.mixer.Sound("Muzyka\\through space (mp3cut.net).mp3")
 #muzyka2 = pygame.mixer.Sound("Muzyka\\18. Fc Kahuna - Glitterball.Mp3")
 hitD.set_volume(0.1)
 zlomD.set_volume(0.5)
@@ -317,6 +383,7 @@ buttonTRUDNOSC = Button('lightslateblue', 'cadetblue1', 'black', 'Ustaw poziom T
 buttonZAPISZ = Button('lightslateblue', 'cadetblue1', 'black', 'Zapisz stan gry',10)
 buttonKONTYNUUJ = Button('lightslateblue', 'cadetblue1', 'black', 'WCZYTAJ GRĘ',50)
 buttonNOWA_GRA = Button('lightslateblue', 'cadetblue1', 'black', 'NOWA GRA',60)
+buttonGWIAZDY = Button('lightslateblue', 'cadetblue1', 'black', 'Osiągnięcia')
 
 buttonINNE = Button('lightslateblue', 'cadetblue1', 'black', 'Podaj inne imię',10)
 buttonMENU = Button('lightslateblue', 'cadetblue1', 'black', 'Wróć do MENU gry',10)
@@ -353,13 +420,16 @@ AKTUALNY_ID_PROFILU = 0
 
 muzyka1.set_volume(0.2)
 muzyka2.set_volume(0.2)
+muzykaMENU.set_volume(0.2)
 MUZYKA = muzyka1
 
 run = True
 podawanieName = False
 czasRespienia = 0
+muzykaMENU.play()
 
 while run:
+
 
     if pygame.time.get_ticks() - czas_gry > 1000:
         czas_gry = pygame.time.get_ticks()
@@ -502,7 +572,6 @@ while run:
                 GRACZ.zniszczone.clear()
                 for zn in Z:
                     GRACZ.zniszczone.append(zn)
-                print(GRACZ.zniszczone)
                 cursor.execute("SELECT * FROM technologie WHERE id = ?",[id])
                 t = cursor.fetchone()
                 T = []
@@ -515,17 +584,22 @@ while run:
                 buttonKONIEC.time = pygame.time.get_ticks()
                 katGracza = 0
                 buttonBaza.updateText("Powrót do bazy")
+                GRACZ.zaktualizujGwiazdy()
+                AKTUALNA_LICZBA_GWIAZDEK = GRACZ.zliczGwiazdy()
+                przygotujPrzyciskiOdczyt()
                 break
 
             if buttonsUsunZapisy[i].clik():
                 imie = zapisy[i][0]
-                cursor.execute("DELETE FROM gracze WHERE id = ?", [AKTUALNY_ID_PROFILU])
-                cursor.execute("DELETE FROM technologie WHERE id = ?", [AKTUALNY_ID_PROFILU])
-                cursor.execute("DELETE FROM zniszczone WHERE id = ?", [AKTUALNY_ID_PROFILU])
+                cursor.execute("SELECT id FROM gracze WHERE name = ?", [imie])
+                idDELETE = cursor.fetchone()[0]
+                cursor.execute("DELETE FROM gracze WHERE name = ?", [imie])
+                cursor.execute("DELETE FROM technologie WHERE id = ?", [idDELETE])
+                cursor.execute("DELETE FROM zniszczone WHERE id = ?", [idDELETE])
                 cursor.execute("INSERT INTO gracze VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                               ["WOLNE", 200, 200, 15, 200, 5, 3, 100, 1, 3, 10, 10, 10, 5000, 3, 0, 1, 0, 0, 0, 0, 0,100,0])
-                cursor.execute("INSERT INTO technologie VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                               ["WOLNE", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+                               ["WOLNE", 200, 200, 15, 200, 5, 3, 100, 1, 3, 10, 10, 10000, 5000, 3, 0, 1, 0, 0, 0, 0, 0,100,0])
+                cursor.execute("INSERT INTO technologie VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                                ["WOLNE", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1])
                 cursor.execute("INSERT INTO zniszczone VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                                ["WOLNE", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
                 db.commit()
@@ -550,16 +624,23 @@ while run:
         cursor.execute("DELETE FROM gracze WHERE id = ?", [AKTUALNY_ID_PROFILU])
         cursor.execute("DELETE FROM technologie WHERE id = ?", [AKTUALNY_ID_PROFILU])
         cursor.execute("DELETE FROM zniszczone WHERE id = ?", [AKTUALNY_ID_PROFILU])
+        cursor.execute("DELETE FROM gwiazdy WHERE id = ?", [AKTUALNY_ID_PROFILU])
         cursor.execute("INSERT INTO gracze VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[AKTUALNY_ID_PROFILU,aktualneName,GRACZ.hp,GRACZ.maxHP,GRACZ.maxZlom,GRACZ.zasiegMagnesu,GRACZ.maxRakiety,GRACZ.szybkoscRakiet,GRACZ.maxTemperatura,GRACZ.iloscLaserow,GRACZ.kosztNaprawy, GRACZ.cenaZlomu,GRACZ.mocLaseru,GRACZ.czasOdnawianiaOslony,GRACZ.kasa,GRACZ.procki,GRACZ.wykonaneMisje, TRUDNOSC, GRACZ.strzalyAll,GRACZ.trafioneAll,GRACZ.kasaAll,GRACZ.prockiAll,GRACZ.wirus,GRACZ.mocRakiet,GRACZ.glowica])
-        lista = [AKTUALNY_ID_PROFILU,name]
+        lista = [AKTUALNY_ID_PROFILU,aktualneName]
         for tech in TECHY:
             lista.append(tech.stopien)
         cursor.execute("INSERT INTO technologie VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",lista)
         lista.clear()
-        lista = [AKTUALNY_ID_PROFILU,name]
+        lista = [AKTUALNY_ID_PROFILU,aktualneName]
         for zn in GRACZ.zniszczone:
                 lista.append(zn)
         cursor.execute("INSERT INTO zniszczone VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",lista)
+        lista.clear()
+        lista = [AKTUALNY_ID_PROFILU, aktualneName, 0]
+        for gw in GRACZ.gwiazdy:
+            lista.append(gw.zaliczone)
+        cursor.execute("INSERT INTO gwiazdy VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",lista)
+
         db.commit()
         GRA_ZAPISANA = True
         FAZA = 5
@@ -567,6 +648,7 @@ while run:
 
     # Baza
     if FAZA == 5:
+
         okno.blit(fontNazwyFaz.render("BAZA", True, BIALY), (90, 10))
         x = 700
         y = 50
@@ -574,12 +656,17 @@ while run:
             buttonNaprawa.color = (255,255,0)
         else:
             buttonNaprawa.color = 'lightslateblue'
-        buttonNaprawa.render(okno,x,y,250,50)
-        buttonStstystyki.render(okno,x,y+120,250,50)
-        buttonUlepszenia.render(okno,x,y+60,250,50)
-        buttonMisja.render(okno,x,y+180,250,75)
+        buttonNaprawa.render(okno,x,40,250,50)
+        buttonUlepszenia.render(okno, x, 100, 250, 50)
+        buttonStstystyki.render(okno,x,160,250,50)
+        if AKTUALNA_LICZBA_GWIAZDEK != GRACZ.zliczGwiazdy():
+            buttonGWIAZDY.color = (255, 255, 0)
+        else:
+            buttonGWIAZDY.color = 'lightslateblue'
+        buttonGWIAZDY.render(okno, x, 220, 250, 50)
+        buttonMisja.render(okno, x, 280, 250, 75)
         if not GRA_ZAPISANA:
-            buttonZAPISZ.render(okno,x,y+300,250,50)
+            buttonZAPISZ.render(okno,x,390,250,50)
 
         buttonMENU.render(okno, x, y+440, 250, 50)
         if buttonMENU.clik():
@@ -602,7 +689,7 @@ while run:
         okno.blit(fontMala.render("ZASIĘG MAGNESU:    " + str(GRACZ.zasiegMagnesu), True, BIALY), (20, 265))
         okno.blit(fontMala.render("ILOŚĆ RAKIET:            " + str(GRACZ.maxRakiety), True, BIALY), (20, 290))
         okno.blit(fontMala.render("SZYBKOŚĆ RAKIET:     " + str(GRACZ.szybkoscRakiet), True, BIALY), (20, 315))
-        okno.blit(fontMala.render("MOC RAKIET:          " + str(GRACZ.mocRakiet), True, BIALY), (20, 340))
+        okno.blit(fontMala.render("MOC RAKIET:             " + str(GRACZ.mocRakiet), True, BIALY), (20, 340))
         okno.blit(fontMala.render("KOSZT NAPRAWY:      " + str(GRACZ.kosztNaprawy) + "$ / 1 HP", True, BIALY), (20, 365))
         okno.blit(fontMala.render("CENA ZŁOMU:             " + str(GRACZ.cenaZlomu) + "$ / 1 złom", True, BIALY), (20, 390))
         okno.blit(fontMala.render("CZAS OSŁONY:           " + str(GRACZ.czasOdnawianiaOslony/1000) + " s", True, BIALY), (20, 415))
@@ -623,8 +710,13 @@ while run:
             numerTechu = 0
         if buttonMisja.clik():
             FAZA = 1
+            muzykaMENU.set_volume(0.08)
         if buttonStstystyki.clik():
             FAZA = 6
+        if buttonGWIAZDY.clik():
+            FAZA = 12
+            AKTUALNA_LICZBA_GWIAZDEK = GRACZ.zliczGwiazdy()
+
         if buttonNaprawa.clik() and GRACZ.hp < GRACZ.maxHP:
             FAZA = 7
             buttonNapraw1.time = pygame.time.get_ticks()
@@ -645,6 +737,41 @@ while run:
         if buttonZAPISZ.clik():
             FAZA = 9
 
+    if FAZA == 12:
+        okno.blit(fontNazwyFaz.render("Twoje osiągnięcia ", True, BIALY), (180, 2))
+        buttonBaza.render(okno, 30, WYSOKOSC - 70, 180, 50)
+
+
+        if buttonBaza.clik():
+            FAZA = 5
+            GRACZ.zaktualizujNumeryGwiazdek()
+
+        ilosc = 0
+        xg = 30
+        yg = 80
+        for gwiazda in GRACZ.gwiazdy:
+            ilosc += 1
+            if ilosc == 17 or ilosc == 34:
+                yg += 60
+                xg = 30
+            if gwiazda.numer not in GRACZ.numeryPosiadanychGwiazdek:
+                gwiazda.render(okno,xg,yg,myszPozycja,True)
+            else:
+                gwiazda.render(okno,xg,yg,myszPozycja)
+            xg += 60
+
+        for i in range(35):
+            if i < GRACZ.zliczGwiazdy():
+                if i % 5 == 0 and i != 0:
+                    okno.blit(grafikaGwiazda2, (10 + (i * 28), 500))
+                else:
+                    okno.blit(grafikaGwiazda2, (10 + (i * 28), 510))
+            else:
+                if i % 5 == 0 and i != 0:
+                    okno.blit(grafikaGwiazda1, (10 + (i * 28), 500))
+                else:
+                    okno.blit(grafikaGwiazda1, (10 + (i * 28), 510))
+
 
 
     # STATYSTYKI ALL
@@ -660,7 +787,7 @@ while run:
         #okno.blit(fontMala.render("STATYSTYKI MISJI: ", True, CZARNY), (10, y))
         okno.blit(fontMala.render("Strzały laserem: " + str(GRACZ.strzalyAll), True, BIALY), (30, y+30))
         okno.blit(fontMala.render("Trafione: " + str(GRACZ.trafioneAll), True, BIALY), (30, y+50))
-        if GRACZ.trafioneMisja > 0:
+        if GRACZ.trafioneAll > 0:
             okno.blit(fontMala.render("Procent trafień: " + str(round((GRACZ.trafioneAll*100)/GRACZ.strzalyAll,1)) + " %", True, BIALY), (30, y+70))
         else:
             okno.blit(fontMala.render("Procent trafień: 0" , True, BIALY), (30, y+70))
@@ -669,7 +796,7 @@ while run:
         okno.blit(fontMala.render("Zebrane procki: " + str(GRACZ.prockiAll) , True, BIALY),(30, y+130))
         okno.blit(fontMala.render("Wykonane misje: " + str(GRACZ.wykonaneMisje) , True, BIALY),(30, y+150))
         okno.blit(fontMala.render("Pokonanych przeciwników: " + str(sum(GRACZ.zniszczone)) , True, BIALY),(30, y+180))
-        wyswietlStatystykeZniszczonych(GRACZ.zniszczone)
+        wyswietlStatystykeZniszczonych(GRACZ.zniszczone,GRACZ.zniszczoneMisja)
 #naprawa
     if FAZA == 7:
         okno.blit(fontNazwyFaz.render("Naprawa drona ", True, BIALY), (150, 2))
@@ -815,14 +942,17 @@ while run:
         if buttonBaza.clik():
             FAZA = 5
             buttonKONIEC.time = pygame.time.get_ticks()
+            muzykaMENU.set_volume(0.2)
         button1.render(okno,720,20,250,50)
 
         if button.clik() and wybranoMisje:
+            muzykaMENU.stop()
             FAZA = 3
             czasOdliczania = pygame.time.get_ticks()
             odliczanie = 3
             misjaWykonana = False
             y_fabrykatora = 0
+
         if button1.clik() and GRACZ.kasa > 99:
             wybranoMisje = False
             numerWybranejMisji = 0
@@ -849,6 +979,12 @@ while run:
             LASERY_ENEMY.clear()
             ZLOMY.clear()
             WYBUCHY.clear()
+            if RODZAJ_MISJI == 3:
+                MUZYKA = muzyka2
+            if RODZAJ_MISJI == 1 or RODZAJ_MISJI == 4:
+                MUZYKA = muzyka1
+            if RODZAJ_MISJI == 2:
+                MUZYKA = muzyka3
 
             KONIEC_MISJI = False
             wybranoMisje = False
@@ -888,24 +1024,35 @@ while run:
         else:
             okno.blit(fontMala.render("KASA: " + str(GRACZ.kasa)+ "$", True, BIALY),(30, WYSOKOSC - 50))
         buttonBaza.render(okno,785,WYSOKOSC-100,180,50)
+
         if buttonBaza.clik():
+            muzykaMENU.play()
             if misjaWykonana:
                 GRACZ.kasa += (AKTUALNA_MISJA.naroda + GRACZ.cenaZlomu * GRACZ.aktualnyZlom)
                 GRACZ.kasaAll += (AKTUALNA_MISJA.naroda + GRACZ.cenaZlomu * GRACZ.aktualnyZlom)
+                if AKTUALNA_MISJA.naroda + GRACZ.cenaZlomu * GRACZ.aktualnyZlom > 1000:
+                    GRACZ.gwiazdy[26].zalicz()
+
             FAZA = 5
             GRA_ZAPISANA = False
             buttonKONIEC.time = pygame.time.get_ticks()
             DOSTEPNE_MISJE.clear()
             DOSTEPNE_MISJE = losujNoweMisje(GRACZ.wykonaneMisje)
             button.time = pygame.time.get_ticks()
+            #weryfikacja gwiazdek
+            GRACZ.zaktualizujGwiazdy()
 
-        wyswietlStatystykeZniszczonych(GRACZ.zniszczoneMisja)
+
+
+
+        wyswietlStatystykeZniszczonych(GRACZ.zniszczoneMisja,GRACZ.zniszczoneMisja,True)
     #misje
+
     if FAZA == 2:
         if not MUZA:
             if AKTUALNA_MISJA.rodzaj == 4:
                 MUZYKA = muzyka2
-            MUZYKA.play()
+            MUZYKA.play(-1)
             MUZA = True
 
         if RODZAJ_MISJI == 1:
@@ -917,7 +1064,7 @@ while run:
             okno.blit(grafikaFabryka,(337,y_fabrykatora))
             if AKTUALNA_MISJA.beczki[1] == 1:
                 okno.blit(grafikaFabrykaPrawa,(687,0))
-            if AKTUALNA_MISJA.beczki.count(0) == 2:
+            if AKTUALNA_MISJA.beczki.count(0) == 2 and AKTUALNA_MISJA.iloscWiez == 0:
                 y_fabrykatora+=1
         if RODZAJ_MISJI == 3:
             okno.blit(tlo2,(0,0))
@@ -926,46 +1073,64 @@ while run:
         pygame.draw.line(okno,CZARNY,(0,550),(SZEROKOSC,550),4)
 
 
-        if RODZAJ_MISJI == 2 and CZAS_GRY % 7 == 0 and pygame.time.get_ticks() - czasRespienia > 1100 and AKTUALNA_MISJA.iloscWiez > 0 :
+        if RODZAJ_MISJI == 2 and CZAS_GRY % 7 == 0 and pygame.time.get_ticks() - czasRespienia > 1100 and (AKTUALNA_MISJA.beczki[0] == 1 or AKTUALNA_MISJA.beczki[1] == 1):
             czasRespienia = pygame.time.get_ticks()
             produkcjaFabrykaD.play()
             if random.randint(1,100) < 50:
-                ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI))
-            else:
-                ENEMY.append(Enemy(RODZAJ_MISJI))
+                if AKTUALNA_MISJA.wiodacyPrzeciwnik in (1, 2, 3):
+                    AKTUALNA_MISJA.przeciwnicy.append(Enemy(RODZAJ_MISJI))
+                elif AKTUALNA_MISJA.wiodacyPrzeciwnik in (4, 5):
+                    AKTUALNA_MISJA.przeciwnicy.append(EnemyMysliwiec(RODZAJ_MISJI))
+                elif AKTUALNA_MISJA.wiodacyPrzeciwnik in (6, 7):
+                    AKTUALNA_MISJA.przeciwnicy.append(EnemyKanonierka(RODZAJ_MISJI))
+                elif AKTUALNA_MISJA.wiodacyPrzeciwnik in (8, 9):
+                    AKTUALNA_MISJA.przeciwnicy.append(EnemyScigacz(RODZAJ_MISJI))
+                elif AKTUALNA_MISJA.wiodacyPrzeciwnik == 10:
+                    AKTUALNA_MISJA.przeciwnicy.append(EnemyKanonierka(RODZAJ_MISJI))
+                elif AKTUALNA_MISJA.wiodacyPrzeciwnik >= 11:
+                    AKTUALNA_MISJA.przeciwnicy.append(EnemyPancernik(RODZAJ_MISJI))
+
             czasRespienia = pygame.time.get_ticks()
 
-
-
-
-
+        numerTrafionegoRakieta = -1
         for rakieta in RAKIETY:
-            rakieta.update(okno,RODZAJ_MISJI)
-            if not rakieta.jest:
-                WYBUCHY.append(Wybuch(rakieta.getRect().topleft[0]-20,rakieta.getRect().topleft[1]-20,2))
-                if GRACZ.glowica > 0 and rakieta.x < SZEROKOSC and rakieta.y > 0:
-                    pygame.draw.circle(okno, CZERWONY, (rakieta.x, rakieta.y), GRACZ.glowica, 4)
-                    for enemy in ENEMY:
-                        odleglosc = obliczOdleglosc(rakieta.x, rakieta.y, enemy.getRect().centerx,enemy.getRect().centery)
-                        if odleglosc <= GRACZ.glowica:
-                            obrazenia = GRACZ.mocRakiet * 0.01 * ((odleglosc * 100) // GRACZ.glowica)
-                            if enemy.rodzaj in [6, 8, 10]:
-                                if enemy.oslona:
-                                    enemy.oslona = False
-                                    enemy.czasOslony = pygame.time.get_ticks()
+            for enemy in ENEMY:
+                if rakieta.getRect().colliderect(enemy.getRect()):
+                    numerTrafionegoRakieta = ENEMY.index(enemy)
+                    if (not AKTUALNA_MISJA.trwaPoscig and RODZAJ_MISJI ==3) or RODZAJ_MISJI !=3  :
+                        if enemy.rodzaj == 9 and enemy.odpornosc == 1 and GRACZ.wirus > 0:
+                            enemy.odpornosc = 0
+                        if enemy.rodzaj == 13 and enemy.odpornosc == 2 and GRACZ.wirus > 0:
+                            enemy.odpornosc = 0
+                        if enemy.rodzaj in [6,8,10,14]:
+                            if enemy.oslona:
+                                enemy.oslona = False
+                                enemy.czasOslony = pygame.time.get_ticks()
                             else:
-                                enemy.hit(int(obrazenia))
+                                enemy.hit(rakieta.moc)
+                        else:
+                            enemy.hit(rakieta.moc)
+
+                        rakieta.jest = False
+                        wybuchRakietyD.play()
                         if enemy.hp <= 0:
-                            if enemy.rodzaj in [9, 10, 13]:
-                                WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
-                            elif enemy.rodzaj == 12:
+                            if enemy.rodzaj in [9,10,13]:
+                                WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50,3))
+                            elif enemy.rodzaj in [12,14]:
+                                if enemy.rodzaj == 14:
+                                    ENEMY.append(Enemy(RODZAJ_MISJI,enemy.x+60,enemy.y+60))
+                                    ENEMY.append(Enemy(RODZAJ_MISJI,enemy.x+60,enemy.y+60))
+                                    ENEMY.append(Enemy(RODZAJ_MISJI,enemy.x+60,enemy.y+60))
+                                    ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI,enemy.x+60,enemy.y+60))
+                                    ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI,enemy.x+60,enemy.y+60))
+                                    ENEMY.append(EnemyScigacz(RODZAJ_MISJI,enemy.x+60,enemy.y+60))
                                 WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
                                 WYBUCHY.append(Wybuch(enemy.x - 25, enemy.y + 50, 3))
                                 WYBUCHY.append(Wybuch(enemy.x, enemy.y + 75, 3))
                             else:
-                                WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 1))
+                                WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50,1))
                             wybuchD.play()
-                            generujZlom(enemy, ZLOMY, PROCKI)
+                            generujZlom(enemy, ZLOMY,PROCKI)
                             GRACZ.zniszczone[enemy.rodzaj] += 1
                             GRACZ.zniszczoneMisja[enemy.rodzaj] += 1
                         if not enemy.jest:
@@ -976,53 +1141,62 @@ while run:
                             if enemy.rodzaj == 12 and enemy.x == 695:
                                 AKTUALNA_MISJA.beczki[1] = 0
                             ENEMY.remove(enemy)
+                    elif AKTUALNA_MISJA.trwaPoscig and enemy.rodzaj == 5:
+                            enemy.hit(rakieta.moc)
+                            rakieta.jest = False
+                            wybuchRakietyD.play()
+                            if not enemy.jest:
+                                WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 1))
+                                ENEMY.remove(enemy)
+
+        for rakieta in RAKIETY:
+            rakieta.update(okno,RODZAJ_MISJI)
+            if not rakieta.jest:
+                WYBUCHY.append(Wybuch(rakieta.getRect().topleft[0]-20,rakieta.getRect().topleft[1]-20,2))
+                if GRACZ.glowica > 0 and rakieta.x < SZEROKOSC and rakieta.y > 0:
+                    pygame.draw.circle(okno, CZERWONY, (rakieta.x, rakieta.y), GRACZ.glowica, 4)
+                    for enemy in ENEMY:
+                        if ENEMY.index(enemy) != numerTrafionegoRakieta:
+                            odleglosc = obliczOdleglosc(rakieta.x, rakieta.y, enemy.getRect().centerx,enemy.getRect().centery)
+                            if odleglosc <= GRACZ.glowica:
+                                obrazenia = GRACZ.mocRakiet * 0.01 * ((odleglosc * 100) // GRACZ.glowica)
+                                if enemy.rodzaj in [6, 8, 10, 14]:
+                                    if enemy.oslona:
+                                        enemy.oslona = False
+                                        enemy.czasOslony = pygame.time.get_ticks()
+                                else:
+                                    enemy.hit(int(obrazenia))
+                            if enemy.hp <= 0:
+                                if enemy.rodzaj in [9, 10, 13]:
+                                    WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
+                                elif enemy.rodzaj in [12,14]:
+                                    if enemy.rodzaj == 14:
+                                        ENEMY.append(Enemy(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                        ENEMY.append(Enemy(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                        ENEMY.append(Enemy(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                        ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                        ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                        ENEMY.append(EnemyScigacz(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                    WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
+                                    WYBUCHY.append(Wybuch(enemy.x - 25, enemy.y + 50, 3))
+                                    WYBUCHY.append(Wybuch(enemy.x, enemy.y + 75, 3))
+                                else:
+                                    WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 1))
+                                wybuchD.play()
+                                generujZlom(enemy, ZLOMY, PROCKI)
+                                GRACZ.zniszczone[enemy.rodzaj] += 1
+                                GRACZ.zniszczoneMisja[enemy.rodzaj] += 1
+                            if not enemy.jest:
+                                if enemy.rodzaj == 11:
+                                    AKTUALNA_MISJA.iloscWiez -= 1
+                                if enemy.rodzaj == 12 and enemy.x == 300:
+                                    AKTUALNA_MISJA.beczki[0] = 0
+                                if enemy.rodzaj == 12 and enemy.x == 695:
+                                    AKTUALNA_MISJA.beczki[1] = 0
+                                ENEMY.remove(enemy)
                 RAKIETY.remove(rakieta)
 
 
-
-
-        for rakieta in RAKIETY:
-            for enemy in ENEMY:
-                if rakieta.getRect().colliderect(enemy.getRect()):
-                    if enemy.rodzaj == 9 and enemy.odpornosc == 1 and GRACZ.wirus == 1:
-                        enemy.odpornosc = 0
-                    if enemy.rodzaj == 13 and enemy.odpornosc == 2 and GRACZ.wirus == 1:
-                        enemy.odpornosc = 0
-                    if enemy.rodzaj in [6,8,10]:
-                        if enemy.oslona:
-                            enemy.oslona = False
-                            enemy.czasOslony = pygame.time.get_ticks()
-                        else:
-                            enemy.hit(rakieta.moc)
-                    else:
-                        enemy.hit(rakieta.moc)
-
-
-
-
-                    rakieta.jest = False
-                    wybuchRakietyD.play()
-                    if enemy.hp <= 0:
-                        if enemy.rodzaj in [9,10,13]:
-                            WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50,3))
-                        elif enemy.rodzaj == 12:
-                            WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
-                            WYBUCHY.append(Wybuch(enemy.x - 25, enemy.y + 50, 3))
-                            WYBUCHY.append(Wybuch(enemy.x, enemy.y + 75, 3))
-                        else:
-                            WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50,1))
-                        wybuchD.play()
-                        generujZlom(enemy, ZLOMY,PROCKI)
-                        GRACZ.zniszczone[enemy.rodzaj] += 1
-                        GRACZ.zniszczoneMisja[enemy.rodzaj] += 1
-                    if not enemy.jest:
-                        if enemy.rodzaj == 11:
-                            AKTUALNA_MISJA.iloscWiez -= 1
-                        if enemy.rodzaj == 12 and enemy.x == 300:
-                            AKTUALNA_MISJA.beczki[0] = 0
-                        if enemy.rodzaj == 12 and enemy.x == 695:
-                            AKTUALNA_MISJA.beczki[1] = 0
-                        ENEMY.remove(enemy)
 
         GRACZ.update(okno,RODZAJ_MISJI,klawisze,myszKlik,myszPozycja,LASERY,RAKIETY)
         for laser in LASERY:
@@ -1132,8 +1306,18 @@ while run:
                     GRACZ.trafioneAll += 1
                     GRACZ.trafioneMisja += 1
                     if enemy.hp <= 0:
-                        if enemy.rodzaj in [9, 10,13]:
+                        if enemy.rodzaj in [9, 10, 13]:
                             WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
+                        elif enemy.rodzaj == 14:
+                            ENEMY.append(Enemy(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                            ENEMY.append(Enemy(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                            ENEMY.append(Enemy(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                            ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                            ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                            ENEMY.append(EnemyScigacz(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                            WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
+                            WYBUCHY.append(Wybuch(enemy.x - 25, enemy.y + 50, 3))
+                            WYBUCHY.append(Wybuch(enemy.x, enemy.y + 75, 3))
                         else:
                             WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 1))
                         wybuchD.play()
@@ -1158,7 +1342,14 @@ while run:
                         if enemy.hp <= 0:
                             if enemy.rodzaj in [9, 10,13]:
                                 WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
-                            elif enemy.rodzaj == 12:
+                            elif enemy.rodzaj in [12,14]:
+                                if enemy.rodzaj == 14:
+                                    ENEMY.append(Enemy(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                    ENEMY.append(Enemy(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                    ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                    ENEMY.append(EnemyMysliwiec(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+                                    ENEMY.append(EnemyScigacz(RODZAJ_MISJI, enemy.x + 60, enemy.y + 60))
+
                                 WYBUCHY.append(Wybuch(enemy.x - 50, enemy.y - 50, 3))
                                 WYBUCHY.append(Wybuch(enemy.x - 25, enemy.y + 50, 3))
                                 WYBUCHY.append(Wybuch(enemy.x , enemy.y + 75, 3))
@@ -1192,7 +1383,7 @@ while run:
                         GRACZ.czasOslony = pygame.time.get_ticks()
                     else:
                         GRACZ.hit(100)
-                    if enemy.rodzaj in [6, 8,10]:
+                    if enemy.rodzaj in [6, 8, 10,14]:
                         if enemy.oslona:
                             enemy.oslona = False
                             enemy.czasOslony = pygame.time.get_ticks()
