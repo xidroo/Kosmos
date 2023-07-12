@@ -67,17 +67,23 @@ class Gracz:
     zniszczone = []
     zniszczoneMisja = []
     wykonaneMisje = 0
+    wykonaneObrony = 0
+    wykonanePoscigi = 0
+    wykonaneSzwadrony = 0
+    wykonaneFabrykatory = 0
     zlomMisja = 0
     zlomAll = 0
     kasaAll = 0
     prockiAll = 0
     prockiMisja = 0
+
+
     __cecha = 0
     gwiazdy = []
     numeryPosiadanychGwiazdek = []
 
 
-    def __init__(self,numer,rodzajMisji, TRUDNOSC,hp = None, maxHP = None,maxZlomu = None,zasiegMagnezu = None,rakietyMax = None, szybkoscTakiet = None, maxTemperatura = None, iloscLaserow = None, kosztNaprawy = None, cenaZlomu = None,mocLaseru = None, czasOdnawianiaOslony = None, kasa = None,procki = None, liczbaWykonanychMisji =None,strzalyAll = None,trafioneAll = None,kasaAll = None, prockiAll = None,wirus =None,mocRakiety = None,glowica = None,gwiazdy = None):
+    def __init__(self,numer,rodzajMisji, TRUDNOSC,hp = None, maxHP = None,maxZlomu = None,zasiegMagnezu = None,rakietyMax = None, szybkoscTakiet = None, maxTemperatura = None, iloscLaserow = None, kosztNaprawy = None, cenaZlomu = None,mocLaseru = None, czasOdnawianiaOslony = None, kasa = None,procki = None, liczbaWykonanychMisji =None,strzalyAll = None,trafioneAll = None,kasaAll = None, prockiAll = None,wirus =None,mocRakiety = None,glowica = None,zlomAll = None,wykonaneObrony = None,wykonanePoscigi = None,wykonaneSzwadrony = None,wykonaneFabrykatory = None):
         if numer == 1:
             if rodzajMisji in [1,2]:
                 self.x = SZEROKOSC//2
@@ -126,26 +132,32 @@ class Gracz:
                 self.maxZlom = 15
             else:
                 self.maxZlom = maxZlomu
+
             if zasiegMagnezu == None:
                 self.zasiegMagnesu = 200
             else:
                 self.zasiegMagnesu = zasiegMagnezu
+
             if rakietyMax == None:
                 self.maxRakiety = 5
             else:
                 self.maxRakiety = rakietyMax
             self.aktualneRakiety = self.maxRakiety
+
             if maxTemperatura == None:
                 self.maxTemperatura = 100
             else:
                 self.maxTemperatura = maxTemperatura
+
             self.aktualnaTemperatura = 0
             self.przegrzanie = False
             self.font = pygame.font.SysFont('comicsansms', 20)
+
             if iloscLaserow == None:
                 self.iloscLaserow = 1
             else:
                 self.iloscLaserow = iloscLaserow
+
             if kasa == None and procki == None:
                 if TRUDNOSC == 1:
                     self.kasa = 5000
@@ -159,10 +171,12 @@ class Gracz:
             else:
                 self.kasa = kasa
                 self.procki = procki
+
             if kosztNaprawy == None:
                 self.kosztNaprawy = 3
             else:
                 self.kosztNaprawy = kosztNaprawy
+
             if cenaZlomu == None:
                 self.cenaZlomu = 10
             else:
@@ -212,12 +226,37 @@ class Gracz:
                 self.zniszczone.append(0)
                 self.zniszczoneMisja.append(0)
 
-            self.gwiazdy.clear()
-            if gwiazdy == None:
-                for i in range(1,31):
-                    self.gwiazdy.append(Gwiazda(i))
+
+
+            if zlomAll == None:
+                self.zlomAll = 0
             else:
-                self.gwiazdy = gwiazdy
+                self.zlomAll = zlomAll
+
+            if wykonaneObrony == None:
+                self.wykonaneObrony = 0
+            else:
+                self.wykonaneObrony = wykonaneObrony
+
+            if wykonanePoscigi == None:
+                self.wykonanePoscigi = 0
+            else:
+                self.wykonanePoscigi = wykonanePoscigi
+
+            if wykonaneSzwadrony == None:
+                self.wykonaneSzwadrony = 0
+            else:
+                self.wykonaneSzwadrony = wykonaneSzwadrony
+
+            if wykonaneFabrykatory == None:
+                self.wykonaneFabrykatory = 0
+            else:
+                self.wykonaneFabrykatory = wykonaneFabrykatory
+
+            self.gwiazdy = []
+
+            for i in range(1, 42):
+                self.gwiazdy.append(Gwiazda(i))
 
             self.zaktualizujGwiazdy()
 

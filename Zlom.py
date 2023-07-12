@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from random import randint
 from random import choice
@@ -31,7 +33,10 @@ class Zlom:
             self.dx = choice([1.8,1.7,1.6,1.5,1.4,1.3,1.2,1.1,1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1,0,-1.8,-1.7,-1.6,-1.5,-1.4,-1.3,-1.2,-1.1,-1,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1])
             self.dy = choice([1.5,1,0,-2,-1.9,-1.8,-1.7,-1.6,-1.5,-1.4,-1.3,-1.2,-1.1,-1,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1])
             self.kat = 0
-            self.dKat = 90
+            if random.randint(1,2) == 1:
+                self.dKat = 90
+            else:
+                self.dKat = 45
             self.granicaX = SZEROKOSC
             self.granicaY = WYSOKOSC
             self.czas = pygame.time.get_ticks()

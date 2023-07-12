@@ -1,9 +1,9 @@
 import pygame
 from Button import Button
 CZARNY = (0,0,0)
-CZERWONY = ('red')
+CZERWONY = ('burlywood4')
 FIOLETOWY = (128, 0, 128)
-BIALY = ("crimson")
+BIALY = ("gray35")
 
 
 class Technologia:
@@ -200,18 +200,18 @@ class Technologia:
         else:
             if self.cenaBadania <= GRACZ.procki or GRACZ.procki == 0:
                 if self.cenaBadania == 1:
-                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt: " + str(self.cenaBadania) + " procek", True, CZARNY),(15,25))
+                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt zbadania: " + str(self.cenaBadania) + " procek", True, CZARNY),(15,25))
                 elif self.cenaBadania >= 2 and self.cenaBadania <= 4:
-                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt: " + str(self.cenaBadania) + " procki", True, CZARNY),(15,25))
+                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt zbadania: " + str(self.cenaBadania) + " procki", True, CZARNY),(15,25))
                 else:
-                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt: " + str(self.cenaBadania) + " procków", True, CZARNY),(15,25))
+                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt zbadania: " + str(self.cenaBadania) + " procków", True, CZARNY),(15,25))
             else:
                 if self.cenaBadania == 1:
-                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt: " + str(self.cenaBadania) + " procek", True, CZERWONY), (15, 25))
+                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt zbadania: " + str(self.cenaBadania) + " procek", True, CZERWONY), (15, 25))
                 elif self.cenaBadania >= 2 and self.cenaBadania <= 4:
-                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt: " + str(self.cenaBadania) + " procki", True, CZERWONY), (15, 25))
+                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt zbadania: " + str(self.cenaBadania) + " procki", True, CZERWONY), (15, 25))
                 else:
-                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt: " + str(self.cenaBadania) + " procków", True, CZERWONY),(15, 25))
+                    self.powierzchniaDuza.blit(self.fontNaglowek.render("Koszt zbadania: " + str(self.cenaBadania) + " procków", True, CZERWONY),(15, 25))
 
         self.powierzchniaDuza.blit(self.fontNaglowek.render(self.nazwaStopien1, True, CZARNY), (15, 105))
         if self.stopien >= 1:

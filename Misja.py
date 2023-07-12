@@ -12,6 +12,7 @@ from EnemyPrzewodnik import EnemyPrzewodnik
 from EnemyWieza import EnemyWieza
 from EnemyPancernik import EnemyPancernik
 from EnemyHybryd import EnemyHybryd
+from EnemyWspieracz import EnemyWspieracz
 from Beczka import Beczka
 CZARNY = (0,0,0)
 BIALY = (255,255,255)
@@ -82,7 +83,7 @@ class Misja:
     def inicjujWrogow(self,TRUDNOSC):
         self.przeciwnicy.clear()
 
-        self.przeciwnicy.append(EnemyHybryd(self.rodzaj))
+
         zwyklaki = min(3+TRUDNOSC+self.poziom//10,2+self.poziom)
         mysliwce = min(2+TRUDNOSC+self.poziom//10,self.poziom+1)
         kanonierki = min(2+TRUDNOSC+self.poziom//10,self.poziom-1)
@@ -91,6 +92,13 @@ class Misja:
         kargo = min(1+TRUDNOSC+self.poziom//10,self.poziom)
         krazownik = min(1+TRUDNOSC+self.poziom//10,self.poziom-3)
         pancerniki = min(0+TRUDNOSC+self.poziom//10,self.poziom-4)
+        hybrydy = min(0+TRUDNOSC+self.poziom//10,self.poziom-5)
+        wspieracze = 0
+        if TRUDNOSC > 4:
+            wspieracze = 1
+        elif TRUDNOSC > 10:
+            wspieracze = 2
+
         if self.rodzaj == 4:
             self.przeciwnicy.append(EnemyPrzewodnik())
         if self.rodzaj == 1:  # babowiecd
@@ -146,6 +154,10 @@ class Misja:
             self.przeciwnicy.append(EnemyKrazownik(self.rodzaj))
         for i in range(pancerniki):
             self.przeciwnicy.append(EnemyPancernik(self.rodzaj))
+        for i in range(hybrydy):
+            self.przeciwnicy.append(EnemyHybryd(self.rodzaj))
+        for i in range(wspieracze):
+            self.przeciwnicy.append(EnemyWspieracz(self.rodzaj))
 
         if self.rodzaj == 4:
             x = 850

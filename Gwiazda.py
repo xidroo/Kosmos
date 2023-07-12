@@ -4,10 +4,10 @@ from Button import Button
 BIALY = (255,255,255)
 
 class Gwiazda:
-    grafika1 = pygame.image.load("Grafika\gwiazda1m.png")
-    grafika2 = pygame.image.load("Grafika\gwiazda2m.png")
-    grafika3 = pygame.image.load("Grafika\gwiazda3m.png")
-    grafika4 = pygame.image.load("Grafika\gwiazda4m.png")
+    grafika1 = pygame.image.load("Grafika\gwiazda3m.png")
+    grafika2 = pygame.image.load("Grafika\gwiazda4m.png")
+    grafika3 = pygame.image.load("Grafika\Star_01.png")
+    grafika4 = pygame.image.load("Grafika\Star_03.png")
     def __init__(self,numer,zaliczone = 0):
         self.grafika1.set_colorkey(BIALY)
         self.grafika2.set_colorkey(BIALY)
@@ -72,7 +72,28 @@ class Gwiazda:
             self.opis = "GRUBA KUPA SIANA: Zgarnij w sumie 75000$"
         if numer == 27:
             self.opis = "KUPKA SIANKA: Zgarnij w trakcie 1 misji ponad 1000$"
-        if numer > 27:
+        if numer == 28:
+            self.opis = "SOKOLE OKO: Uzyskaj procen trafień w misji powyżej 75%"
+        if numer == 29:
+            self.opis = "SNAJPER: Uzyskaj procen trafień w misji powyżej 90%"
+        if numer == 30:
+            self.opis = "OBRONA PLANETY - POCZĄTEK: wykonaj 5 misji Obrona Planety"
+        if numer == 31:
+            self.opis = "POŚCIG - POCZĄTEK: wykonaj 5 misji Pościg"
+        if numer == 32:
+            self.opis = "SZWADRON - POCZĄTEK: wykonaj 5 misji Szwadron"
+        if numer == 33:
+            self.opis = "FABRYKATOR - POCZĄTEK: wykonaj 5 misji Fabrykator"
+        if numer == 34:
+            self.opis = "OBRONA PLANETY - EKSPERT: wykonaj 15 misji Obrona Planety"
+        if numer == 35:
+            self.opis = "POŚCIG - EKSPERT: wykonaj 15 misji Pościg"
+        if numer == 36:
+            self.opis = "SZWADRON - EKSPERT: wykonaj 15 misji Szwadron"
+        if numer == 37:
+            self.opis = "FABRYKATOR - EKSPERT: wykonaj 15 misji Fabrykator"
+
+        if numer > 37:
             self.opis = "NIE OKRESLONO"
 
     def zalicz(self):
