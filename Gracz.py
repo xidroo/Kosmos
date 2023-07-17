@@ -57,6 +57,7 @@ class Gracz:
     wirus = 0
     kat = 0
     glowica = 0
+    slotyDopalaczy = 0
 
 
     #statystyki
@@ -76,6 +77,8 @@ class Gracz:
     kasaAll = 0
     prockiAll = 0
     prockiMisja = 0
+    dopalaczeAktywne = []
+    dopalaczeMagazyn = []
 
 
     __cecha = 0
@@ -84,6 +87,7 @@ class Gracz:
 
 
     def __init__(self,numer,rodzajMisji, TRUDNOSC,hp = None, maxHP = None,maxZlomu = None,zasiegMagnezu = None,rakietyMax = None, szybkoscTakiet = None, maxTemperatura = None, iloscLaserow = None, kosztNaprawy = None, cenaZlomu = None,mocLaseru = None, czasOdnawianiaOslony = None, kasa = None,procki = None, liczbaWykonanychMisji =None,strzalyAll = None,trafioneAll = None,kasaAll = None, prockiAll = None,wirus =None,mocRakiety = None,glowica = None,zlomAll = None,wykonaneObrony = None,wykonanePoscigi = None,wykonaneSzwadrony = None,wykonaneFabrykatory = None):
+        self.slotyDopalaczy = 3
         if numer == 1:
             if rodzajMisji in [1,2]:
                 self.x = SZEROKOSC//2
@@ -365,7 +369,7 @@ class Gracz:
             self.szerokosc = self.grafika.get_width()
             self.wysokosc = self.grafika.get_height()
 
-    def render(self, window, rodzajMisji,myszPozycja):
+    def render(self, window, rodzajMisji,myszPozycja,klawisze):
         CZARNY = (0,0,0)
         if self.kat != 0:
             kopia = pygame.transform.rotate(self.oryginalnaGrafika, self.kat)
@@ -401,6 +405,30 @@ class Gracz:
         for i in range(self.aktualneRakiety):
             window.blit(Rakieta.grafika, (830+i*15,590))
         window.blit(self.font.render("RAKIETY ", True, (255, 255, 255)), (845, 558))
+
+        if len(self.dopalaczeAktywne) > 0:
+            if len(self.dopalaczeAktywne) == 1:
+                self.dopalaczeAktywne[0].render(window,myszPozycja,klawisze)
+            if len(self.dopalaczeAktywne) == 2:
+                self.dopalaczeAktywne[0].render(window,myszPozycja,klawisze)
+                self.dopalaczeAktywne[1].render(window,myszPozycja,klawisze)
+            if len(self.dopalaczeAktywne) == 3:
+                self.dopalaczeAktywne[0].render(window,myszPozycja,klawisze)
+                self.dopalaczeAktywne[1].render(window,myszPozycja,klawisze)
+                self.dopalaczeAktywne[2].render(window,myszPozycja,klawisze)
+
+        """if self.slotyDopalaczy > 0:
+            #pygame.draw.rect(window, 'white', (298, 588, 52, 52), 2, 5)
+            window.blit(self.font.render("1", True, (255, 255, 255)), (280, 588))
+            if self.slotyDopalaczy == 2:
+                window.blit(self.font.render("2", True, (255, 255, 255)), (460, 588))
+                #pygame.draw.rect(window, 'white', (478, 588, 52, 52), 2, 5)
+            if self.slotyDopalaczy == 3:
+                window.blit(self.font.render("2", True, (255, 255, 255)), (460, 588))
+                window.blit(self.font.render("3", True, (255, 255, 255)), (640, 588))
+                #pygame.draw.rect(window, 'white', (478, 588, 52, 52), 2, 5)
+                #pygame.draw.rect(window, 'white', (658, 588, 52, 52), 2, 5)
+"""
 
     def getRect(self):
         return pygame.Rect((self.x+10,self.y+10,self.szerokosc-10,self.wysokosc-10))
@@ -484,7 +512,7 @@ class Gracz:
                 if rodzajMisji in [3, 4]:
                     RAKIETY.append(Rakieta(self.x+self.szerokosc-5,self.y+self.wysokosc//2-8,self.szybkoscRakiet,0,-90,self.mocRakiet,rodzajMisji))
 
-        self.render(window,rodzajMisji,myszPozycja)
+        self.render(window,rodzajMisji,myszPozycja,klawisze)
 
 
     def hit(self,ile):

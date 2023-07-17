@@ -22,6 +22,9 @@ from Dopalacz import Dopalacz
 
 pygame.init()
 dopalacz1 = Dopalacz(0)
+dopalacz2 = Dopalacz(0)
+dopalacz3 = Dopalacz(0)
+
 grafikaEnemy = pygame.image.load("Grafika\Enemy\enemy1.png")
 grafikaFabryka = pygame.image.load("Grafika\Enemy\\fabryka.png")
 grafikaFabrykaLewa = pygame.image.load("Grafika\Enemy\\fabryka_lewa.png")
@@ -442,7 +445,7 @@ buttonSKLEP = Button('lightslateblue', 'cadetblue1', 'black', 'Sklep')
 buttonSPRZEDAJ_PROCKI = Button('lightslateblue', 'cadetblue1', 'black', 'Sprzedaj procki')
 
 buttonINNE = Button('lightslateblue', 'cadetblue1', 'black', 'Podaj inne imię',10)
-buttonMENU = Button('lightslateblue', 'cadetblue1', 'black', 'Wróć do MENU gry',10)
+buttonMENU = Button('lightslateblue', 'cadetblue1', 'black', 'Wróć do MENU',10)
 buttonROZPOCZNIJ = Button('lightslateblue', 'cadetblue1', 'black', 'ROZPOCZNIJ GRĘ !',50,20)
 fontOdliczanie = pygame.font.SysFont('perpetuatitlingpogrubiony', 450)
 fontNazwyFaz = pygame.font.SysFont('comicsansms', 50)
@@ -652,6 +655,14 @@ while run:
                         GRACZ.gwiazdy[i].zalicz()
                 AKTUALNA_LICZBA_GWIAZDEK = GRACZ.zliczGwiazdy()
                 przygotujPrzyciskiOdczyt()
+                GRACZ.dopalaczeAktywne.clear()
+                dopalacz1.wkladanieDoSlotu(1)
+                GRACZ.dopalaczeAktywne.append(dopalacz1)
+                dopalacz2.wkladanieDoSlotu(2)
+                GRACZ.dopalaczeAktywne.append(dopalacz2)
+                dopalacz3.wkladanieDoSlotu(3)
+                GRACZ.dopalaczeAktywne.append(dopalacz3)
+
                 break
 
             if buttonsUsunZapisy[i].clik():
@@ -750,7 +761,7 @@ while run:
             prockiSprzedane = 0
             sprzedajD.play()
 
-        dopalacz1.render(okno,myszPozycja)
+
 
 
 
@@ -871,7 +882,7 @@ while run:
                 gwiazda.render(okno,xg,yg,myszPozycja)
             xg += 60
 
-        for i in range(35):
+        """for i in range(35):
             if i < GRACZ.zliczGwiazdy():
                 if i % 5 == 0 and i != 0:
                     okno.blit(grafikaGwiazda2, (10 + (i * 28), 500))
@@ -881,7 +892,7 @@ while run:
                 if i % 5 == 0 and i != 0:
                     okno.blit(grafikaGwiazda1, (10 + (i * 28), 500))
                 else:
-                    okno.blit(grafikaGwiazda1, (10 + (i * 28), 510))
+                    okno.blit(grafikaGwiazda1, (10 + (i * 28), 510))"""
 
 
 
@@ -951,7 +962,7 @@ while run:
 
     # ulepszenia
     if FAZA == 8:
-        okno.blit(fontNazwyFaz.render("Kup ulepszenia i zbadaj technologie", True, BIALY),(50,10))
+        okno.blit(fontNazwyFaz.render("Zbadaj technologie i wykup ulepszenia", True, BIALY),(50,10))
         buttonBaza.render(okno, 30,580, 180, 50)
         if buttonBaza.clik():
             FAZA = 5
@@ -1228,7 +1239,7 @@ while run:
 
             czasRespienia = pygame.time.get_ticks()
 
-        dopalacz1.render(okno,myszPozycja)
+
         numerTrafionegoRakieta = -1
         for rakieta in RAKIETY:
             for enemy in ENEMY:
